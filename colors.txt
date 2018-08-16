@@ -1,6 +1,6 @@
-black,(0,0,0)
-red,(227,66,52)
-green,()
-blue
-white
-gold
+black;(0,0,0)
+red;(227,66,52)
+green;(155,228,102)
+blue;(24,112,255)
+white;(255,255,255)
+gold;(255,215,0)
