@@ -17,6 +17,8 @@ class Card:
             "white": 0,
             "gold": 0}
     
+    colors = get_colors()
+    
     default_font_size = 15
 
     def __init__(self, parent_surface, cost, gem_count, points=0, one_use_only=False, category=0, width=141, height=200, coords=[0,0]):
@@ -49,7 +51,7 @@ class Card:
                 TextSurf, TextRect = display_text(str(self.cost[color]),self.font_size,font,textcolor,italic,rotation)
                 textwidth, textheight = TextSurf.get_size()
                 drawy -= int(TextSurf.get_height()*1.1)
-                pygame.draw.circle(self.surface,color,(drawx+textwidth//2,drawy+textheight//2),textwidth)
+                pygame.draw.circle(self.surface,self.colors[color],(drawx+textwidth//2,drawy+textheight//2),textwidth)
                 self.surface.blit(TextSurf,(drawx, drawy))
 
         self.parent_surface.blit(self.surface, self.coords)
