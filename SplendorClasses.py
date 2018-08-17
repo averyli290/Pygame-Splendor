@@ -1,4 +1,5 @@
 import pygame
+from general_functions import *
 
 class Deck:
 
@@ -78,41 +79,56 @@ class Token:
 		self.num -= decrement
 
 class TokenCache:
-	cache = {}
 
 	def __init__(self, listOfTokens = [], limit = 10):
 		# initializes the cache from the list of tokens (assuming no two have the same color)
+		self.cache = {}
 		gemColors = ["black", "red", "green", "blue", "white", "gold"]
 		for color in gemColors:
 			self.cache[color] = Token(color)
 		for token in listOfTokens:
-			self.cache[token.get_gemColor] = token
+			self.cache[token.get_gemColor()] = Token(token.get_gemColor(), token.get_num())
 		self.limit = limit
 
 	def get_num(self, color):
 		# gets the number of tokens of a color
-		return self.cache[color]
+		return self.cache[color].get_num()
 
 	def get_total_num(self):
 		# gets the total number of tokens
-		return sum([self.cache[color] for color in self.cache.keys()])
+		return sum([self.get_num(color) for color in self.cache.keys()])
 
 	def receive(self, increment):
 		# attempts to increase token count, where increment is a TokenCache
 		# returns True if successful ("increment" should not be used again)
 		# returns False if token limit is reached (usually meaning the player has to get rid of some tokens)
-		for color in increment.keys():
-			self.cache[color] += increment.get_num(color)
-		return self.get_total_num() <= limit
+		for color in get_colors().keys():
+			self.cache[color].increase(increment.get_num(color))
+		return self.get_total_num() <= self.limit
 
 	def give(self, decrement):
 		# attempts to decrease token count, where decrement is a TokenCache
 		# returns True if successful ("decrement" is now a carrier)
 		# returns False if not enough tokens; the giving does not happen
-		for color in decrement.keys():
-			if self.cache[color] < decrement.get_num(color):
+		for color in get_colors().keys():
+			if self.get_num(color) < decrement.get_num(color):
 				return False
-		for color in decrement.keys():
-			self.cache[color] -= decrement.get_num(color):
+		for color in get_colors().keys():
+			self.cache[color].decrease(decrement.get_num(color))
 		return True
+
+a = Token("red", 3)
+b = Token("blue", 2)
+cache = TokenCache([a, b])
+a.decrease(2)
+b.decrease(1)
+print(cache.get_num("red"), cache.get_num("blue"), cache.get_total_num())
+n = TokenCache([a, b])
+print(cache.get_num("red"), cache.get_num("blue"), cache.get_total_num())
+print(cache.give(n))
+print(cache.get_num("red"), cache.get_num("blue"), cache.get_total_num())
+print(cache.give(n))
+print(cache.get_num("red"), cache.get_num("blue"), cache.get_total_num())
+print(cache.give(n))
+print(cache.get_num("red"), cache.get_num("blue"), cache.get_total_num())
 
