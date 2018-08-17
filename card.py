@@ -40,7 +40,8 @@ class Card:
         self.font_size1 = int(height*self.default_font_size1/200)
        
         self.surface = pygame.Surface((width,height)) 
-        self.surface.fill((200,200,200))
+        self.cardcolor = (200,200,200)
+        self.surface.fill(self.cardcolor)
         
     def draw(self):
         # Draws the card onto the parent surface with cost and type 
@@ -58,26 +59,41 @@ class Card:
                 pygame.draw.circle(self.surface,self.colors[color],(drawx+textwidth//2,drawy+textheight//2),int(textwidth*0.99))
                 self.surface.blit(TextSurf,(drawx, drawy))
         
-        drawx = self.surface.get_width(); drawy = 0
+        drawx = int(self.surface.get_width()*1.05); drawy = 0
         for color in self.gem_count:
              if self.gem_count[color] > 0:
-                TextSurf, TextRect = display_text(str(self.cost[color]),self.font_size1,font,textcolor,italic,rotation)
-                textwidth, textheight = TextSurf.get_size()
-                drawx -= int(TextSurf.get_width()*1.5)
-                drawy = int(textheight)
-                pygame.draw.circle(self.surface,(255,255,255),(drawx+textwidth//2,drawy+textheight//2),textwidth)
-                pygame.draw.circle(self.surface,self.colors[color],(drawx+textwidth//2,drawy+textheight//2),int(textwidth*0.99))
-                self.surface.blit(TextSurf,(drawx, drawy))
+                for i in range(self.gem_count[color]):
+                    TextSurf, TextRect = display_text(str(self.cost[color]),self.font_size1,font,self.colors[color],False,rotation)
+                    textwidth, textheight = TextSurf.get_size()
+                    drawx -= int(textwidth*2)
+                    drawy = int(textheight)//10
+                    pygame.draw.circle(self.surface,(255,255,255),(drawx+textwidth//2,drawy+textheight//2),textwidth)
+                    pygame.draw.circle(self.surface,self.colors[color],(drawx+textwidth//2,drawy+textheight//2),int(textwidth*0.99))
+                    self.surface.blit(TextSurf,(drawx, drawy))
         self.parent_surface.blit(self.surface, self.coords)
 
     def move(self, new_coords):
         # Sets the coords variable to the specified coordinates
         self.coords[0], self.coords[1] = new_coords[0], new_coords[1]
 
+    # Getters
+    def get_cost(self):
+        return self.cost
+
+    def get_gem_count(self):
+        return self.gem_count
+
+    def get_points(self):
+        return self.points
+
+    def get_category(self):
+        return self.category
+
 
 ###############
 ## TEST CODE ##
 ###############
+'''
 game_surface = pygame.display.set_mode((1440,900)) 
 
 cost = {"black": 1,
@@ -85,7 +101,7 @@ cost = {"black": 1,
         "green": 0,
         "blue": 0,
         "white": 0}
-gem_count = {"black": 2,
+gem_count = {"black": 1,
         "red": 0,
         "green": 0,
         "blue": 0,
@@ -105,3 +121,4 @@ while not done:
     game_surface.fill((7,79,26))
     c.draw()
     pygame.display.flip()
+'''
