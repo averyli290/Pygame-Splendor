@@ -1,6 +1,83 @@
 import pygame
 from general_functions import *
 
+# From card.py
+
+pygame.font.init()
+pygame.init()
+
+class Card:
+    
+    colors = get_colors()
+    
+    def __init__(self, parent_surface, cost, gem_count, points=0, one_use_only=False, category=0, coords=[0,0], width=141, height=200):
+        # Sets up all of the variable needed for the card
+        # Creating the surface for the card
+        
+        self.cost = {"black": 0,
+            "red": 0,
+            "green": 0,
+            "blue": 0,
+            "white": 0}
+        self.gem_count = {"black": 0,
+            "red": 0,
+            "green": 0,
+            "blue": 0,
+            "white": 0,
+            "gold": 0}
+        
+        self.default_font_size0 = 20 ; self.default_font_size1 = 25 # Two font sizes for the cards
+        
+        self.parent_surface = parent_surface
+        for gem in cost: self.cost[gem] += cost[gem]
+        for gem in gem_count: self.gem_count[gem] += gem_count[gem]
+        self.points = points
+        self.one_use_only = one_use_only
+        self.category = category
+        self.width = width
+        self.height = height
+        self.coords = coords
+        
+        self.font_size0 = int(height*self.default_font_size0/200)
+        self.font_size1 = int(height*self.default_font_size1/200)
+        
+        self.surface = pygame.Surface((width,height))
+        self.surface.fill((200,200,200))
+    
+    def draw(self):
+        # Draws the card onto the parent surface with cost and type
+        
+        drawx = 0; drawy = self.surface.get_height()
+        textcolor = (200,200,200); font = pygame.font.get_default_font(); italic = True; rotation=0
+        
+        for color in self.cost:
+            if self.cost[color] > 0:
+                TextSurf, TextRect = display_text(str(self.cost[color]),self.font_size0,font,textcolor,italic,rotation)
+                textwidth, textheight = TextSurf.get_size()
+                drawx = int(textwidth)
+                drawy -= int(TextSurf.get_height()*1.5)
+                pygame.draw.circle(self.surface,(255,255,255),(drawx+textwidth//2,drawy+textheight//2),textwidth)
+                pygame.draw.circle(self.surface,self.colors[color],(drawx+textwidth//2,drawy+textheight//2),int(textwidth*0.99))
+                self.surface.blit(TextSurf,(drawx, drawy))
+        
+        drawx = self.surface.get_width(); drawy = 0
+        for color in self.gem_count:
+            if self.gem_count[color] > 0:
+                TextSurf, TextRect = display_text(str(self.cost[color]),self.font_size1,font,textcolor,italic,rotation)
+                textwidth, textheight = TextSurf.get_size()
+                drawx -= int(TextSurf.get_width()*1.5)
+                drawy = int(textheight)
+                pygame.draw.circle(self.surface,(255,255,255),(drawx+textwidth//2,drawy+textheight//2),textwidth)
+                pygame.draw.circle(self.surface,self.colors[color],(drawx+textwidth//2,drawy+textheight//2),int(textwidth*0.99))
+                self.surface.blit(TextSurf,(drawx, drawy))
+        self.parent_surface.blit(self.surface, self.coords)
+    
+    def move(self, new_coords):
+        # Sets the coords variable to the specified coordinates
+        self.coords[0], self.coords[1] = new_coords[0], new_coords[1]
+
+# end of card.py
+
 class Deck:
 
 	def __init__(self, cards = [], category=0, numCardsShown=4, deckID=None):
@@ -116,6 +193,49 @@ class TokenCache:
 		for color in get_colors().keys():
 			self.cache[color].decrease(decrement.get_num(color))
 		return True
+
+class CardCache:
+
+    def __init__(self, listOfCards = []):
+        # initializes cache given a list of cards
+        self.cache = {}
+        gemColors = ["black", "red", "green", "blue", "white", "gold"]
+        for color in gemColors:
+            self.cache[color] = []
+        for card in listOfCards:
+            # currently assumes only one kind of gem at a time
+            gem_count = card.get_gem_count()
+            gem = ""
+            for color in gem_count.keys():
+                if gem_count[color] > 0:
+                    gem += color
+            self.cache[gem].append(card)
+
+    def get_cache(self):
+        # gets the cache (as a dictionary mapping colors to lists of cards)
+        return self.cache
+
+    def get_num(self, color):
+        # gets the total number of gems of a given color
+        return sum([card.get_gem_count(color) for card in self.cache[color]])
+
+    def get_num_cards(self):
+        # gets the total number of cards
+        return sum([len(self.cache[color]) for color in self.cache.keys()])
+
+    def get_num_points(self):
+        # gets the total number of points (in the cards)
+        return sum([sum(card.get_points() for card in self.cache[color]) for color in self.cache.keys()])
+
+    def add_card(self, card):
+        # adds card to cache
+        # currently assumes only one kind of gem at a time
+        gem_count = card.get_gem_count()
+        gem = ""
+        for color in gem_count.keys():
+            if gem_count[color] > 0:
+                gem += color
+        self.cache[gem].append(card)
 
 a = Token("red", 3)
 b = Token("blue", 2)
