@@ -254,6 +254,61 @@ class CardCache:
                 gem += color
         self.cache[gem].append(card)
 
+class Player:
+
+    def __init__(self, ID, reserveLimit = 3):
+        # initialize variables to defaults for a player
+        # (will need to implement nobles)
+        # (will need to implement a one-use cardCache for expansion)
+        self.ID = ID
+        self.reserveLimit = reserveLimit
+        self.tokenCache = TokenCache()
+        self.cardCache = CardCache()
+        self.reservedCards = []
+
+    def get_cards(self):
+        # gets the cardCache variable
+        return self.cardCache
+
+    def get_tokens(self):
+        # gets the tokenCache variable
+        return self.tokenCache
+
+    def get_reservedCards(self):
+        # gets the reservedCards variable
+        return self.reservedCards
+
+    def receiveTokens(self, tokens):
+        # gains tokens (tokens is a TokenCache object)
+        # returns True/False based on the receive() function from TokenCache class
+        return self.tokenCache.receive(tokens)
+
+    def spendTokens(self, tokens):
+        # attempts to spend tokens (supposedly on something, or discard excess maybe) (tokens is a TokenCache object)
+        # returns True/False based on the give() function from TokenCache class
+        return self.tokenCache.give(tokens)
+
+    def get_numFromCards(self, color):
+        # gets the number of gems of given color just using the cardCache
+        return self.cardCache.get_num(color)
+
+    def get_points(self):
+        # gets the number of points
+        # (will need to modify once nobles is implemented)
+        return self.cardCache.get_num_points()
+
+    def gainCard(self, card):
+        # gains card into cardCache
+        self.cardCache.add_card(card)
+
+    def reserveCard(self, card):
+        # reserves card into reservedCards, up to reserveLimit (in which card will not be reserved)
+        # returns True if successful, False if unsuccessful
+        if len(self.reservedCards) >= 3:
+            return False
+        self.reservedCards.append(card)
+        return True
+
 some_cost = {"black": 0,
             "red": 0,
             "green": 0,
