@@ -29,8 +29,6 @@ class Client(ConnectionListener):
 		# continually reads from stdin and sends whatever is typed to the server
 		while 1:
 			connection.Send({"action": "message", "message": stdin.readline().rstrip("\n")})
-    def update(self):
-		connection.Send({"action": "message", "message": stdin.readline().rstrip("\n")})
 	
 	#######################################
 	### Network event/message callbacks ###

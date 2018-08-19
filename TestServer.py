@@ -21,6 +21,7 @@ class ClientChannel(Channel):
 	##################################
 	
 	def Network_message(self, data):
+        if data['message'] == "gg ez": data['message'] = 'OMEGALUL'
 		self._server.SendToAll({"action": "message", "message": data['message'], "who": self.nickname})
 	
 	def Network_nickname(self, data):
