@@ -53,7 +53,7 @@ class Card:
         textcolor = (200,200,200); font = pygame.font.get_default_font(); italic = True; rotation=0
 
         for color in self.cost:
-            if self.cmst[color] > 0:
+            if self.cost[color] > 0:
                 TextSurf, TextRect = display_text(str(self.cost[color]),self.font_size0,font,textcolor,italic,rotation)
                 textwidth, textheight = TextSurf.get_size()
                 drawx = int(textwidth)
@@ -163,31 +163,10 @@ class Table:
 
 class Token:
 
-    default_font_size = 15
-    color_dict = get_colors()
-
-    def __init__(self, parent_surface, gemColor, num=0, coords=[0,0], radius=81); 
-
+    def __init__(self, gemColor, num=0):
         # initializes variables
         self.gemColor = gemColor
         self.num = num
-        self.coords = coords
-        self.radius = radius
-        self.font_size = self.default_font_size*radius/81
-        self.parent_surface = parent_surface
-
-        # Creating the surface
-        self.surface = pygame.Surface((radius, radius))
-        self.surface_color = self.color_dict[self.gemColor]
-        self.surface.fill(self.surface_color)
-
-    def draw(self):
-        # Draws token onto the parent surface
-        self.parent_surface.blit(self.surface, coords)
-
-    def set_coords(self, new_coords):
-        # Sets the coords to the new position
-        self.coords = new_coords
 
     def get_num(self):
         # gets the number of tokens
@@ -364,144 +343,6 @@ class Player:
         # gains card in reserves
         card = self.reservedCards.pop(index)
         self.gainCard(card)
-
-class Game:
-
-    def create_table_from_file(self, filename):
-        decks = {}
-        with open(filename, ('r')) as f:
-            line = f.readline().split(',')
-            # color(s) (for gem_count), category, deckID, points, "black", "red", "green", "blue", "white"
-            gemColors = ["black", "red", "green", "blue", "white", "gold"]
-            gem_count = {color: 0 for color in gemColors}
-            gem_count[line[0]] += 1
-            category = int(line[1])
-            deckID = int(line[2])
-            points = int(line[3])
-            cost = {"black": int(line[4]),
-                    "red": int(line[5]),
-                    "green": int(line[6]),
-                    "blue": int(line[7]),
-                    "white": int(line[8])}
-            card = Card(parent_surface, cost, gem_count, points, False, category)
-            if deckID not in decks.keys():
-                decks[deckID] = []
-            decks[deckID].append(card)
-        for ID in decks.keys():
-            shuffle(decks[ID])
-        return Table(decks.values())
-
-    def __init__(self, playerIDs, decks = "cards.txt"):
-        # creates a new game given supply decks and player IDs
-        if type(decks) == tyoe("a generic string"):
-            self.table = create_table_from_file(decks)
-        else:
-            self.table = Table(decks)
-        self.players = {}
-        for ID in playerIDs:
-            self.players[ID] = Player(ID, 10)
-        self.turn_list = playerIDs
-        self.turn_index = 0
-        self.tokenBank = TokenCache([Token(color), 7])
-        self.finalStage = [0 for player in self.playerIDs]
-        self.tokenLimitExceeded = False
-
-    def get_turn(self):
-        # Gets whose turn it is
-        return self.turn_list[self.turn_index]
-
-    def isTokenLimitExceeded(self):
-        # Gets the tokenLimitExceeded variable
-
-    def get_finalStage(self):
-        # Gets the state of the final stage of the game ([0,0,0,0] for "is not in final stage")
-        return self.finalStage
-
-    def get_relativePos(self, player):
-        # Gets the relative positions of the players in the frame of given player
-        pass
-
-    def isOver(self):
-        # Determines whether the game is over
-        return self.finalStage == [1,1,1,1]
-
-    def next_turn(self):
-        # Goes to the next player's turn
-        if self.players[self.get_turn()].get_points() >= 15 or sum(self.finalStage) > 0:
-            self.finalStage[self.turn_index] = 1
-        self.turn_index = (self.turn_index + 1) % len(self.turn_list)
-
-    def turn_tokenDraw(self, tokens):
-        # Player uses turn to gain tokens from bank (tokens is a TokenCache object)
-        # Returns 1 (true) if successful, 0 (false) if not, and will not do if false
-        # Returns 2 if token limit is exceeded
-        player = self.players[self.get_turn()]
-        gemColors = ["black", "red", "green", "blue", "white", "gold"]
-        if self.tokens.get_num("gold") > 0:
-            return False
-        distribution = sorted([self.tokens.get_num(color) for color in gemColors])
-        greatestGem = ""
-        for color in gemColors:
-            if self.tokens.get_num(color) == distribution[-1]:
-                greatestGem = color
-        if not (distribution == [0,0,0,1,1,1] or (distribution == [0,0,0,0,0,2] and self.tokenBank.get_num(greatestGem) >= 4)):
-            return False
-        if not self.tokenBank.give():
-            return False
-        return 2 - (player.gainTokens(tokens))
-
-    def turn_buyTableCard(self, deckID, index, tokens):
-        # Player uses turn to buy a card from among the shown cards (tokens is a TokenCache object)
-        # Returns true if successful, false if not, and will not do if false
-        pass
-
-    def turn_buyReserveCard(self, index, tokens):
-        # Player uses turn to buy a card in reserve (tokens is a TokenCache object)
-        # Returns true if successful, false if not, and will not do if false
-        pass
-
-    def turn_reserveCard(self, deckID, index):
-        # Player uses turn to buy a card in reserve (tokens is a TokenCache object)
-        # Returns 1 (true) if successful, 0 (false) if not, and will not do if false
-        # Returns 2 if token limit is exceeded
-        player = self.players[self.get_turn()]
-        if not player.canReserveCard():
-            return False
-        card = self.table.pick_card(deckID, index)
-        player.gainCard(card)
-        good = 1
-        if self.tokenBank.get_num("gold") > 0:
-            goldToken = Token("gold", 1)
-            goldTokenCache = TokenCache([goldToken])
-            good = 2 - (player.gainTokens(goldTokenCache))
-        return good
-            
-    def turn_returnTokens(self, tokens):
-        # Player returns some tokens to the bank (tokens is a TokenCache object)
-        # Returns true if successful, false if not, and will not do if false
-        pass
-
-    def handle_turn(self, turn_type, parameters):
-        # Handles a player's turn using the "turn" functions
-        # Does not use the turn if such function returns false
-        # Returns true if turn is complete, false if unsuccessful or if player is to return tokens
-        if self.tokenLimitExceeded:
-            good = self.turn_returnTokens(parameters[0])
-        if turn_type == "tokenDraw":
-            good = self.turn_tokenDraw(parameters[0])
-        if turn_type == "buyTableCard":
-            good = self.turn_buyTableCard(parameters[0], parameters[1], parameters[2])
-        if turn_type == "buyReserveCard":
-            good = self.turn_buyReserveCard(parameters[0], parameters[1])
-        if turn_type == "reserveCard":
-            good = self.turn_reserveCard(parameters[0], parameters[1])
-        if good == 2:
-            self.tokenLimitExceeded = True
-            good = False
-        if good:
-            self.tokenLimitExceeded = False
-            self.next_turn()
-        return good
 
 some_cost = {"black": 0,
             "red": 0,
