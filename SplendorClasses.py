@@ -1,5 +1,6 @@
 import pygame
 from general_functions import *
+from random import shuffle
 
 # From card.py
 
@@ -74,7 +75,7 @@ class Card:
                     self.surface.blit(TextSurf,(drawx, drawy))
         self.parent_surface.blit(self.surface, self.coords)
 
-    def move(self, new_coords):
+    def set_coords(self, new_coords):
         # Sets the coords variable to the specified coordinates
         self.coords[0], self.coords[1] = new_coords[0], new_coords[1]
 
@@ -133,8 +134,8 @@ class Deck:
 class Table:
 
     def __init__(self, decks):
-                cardsShown = {}
-                supplyDecks = {}
+        cardsShown = {}
+        supplyDecks = {}
         # initializes and sets up the table given decks
         for deck in decks:
             supplyDecks[deck.deckID] = decks
@@ -345,9 +346,36 @@ class Player:
 
 class Game:
 
-    def __init__(self, decks, playerIDs):
+    def create_table_from_file(self, filename):
+        decks = {}
+        with open(filename, ('r')) as f:
+            line = f.readline().split(',')
+            # color(s) (for gem_count), category, deckID, points, "black", "red", "green", "blue", "white"
+            gemColors = ["black", "red", "green", "blue", "white", "gold"]
+            gem_count = {color: 0 for color in gemColors}
+            gem_count[line[0]] += 1
+            category = int(line[1])
+            deckID = int(line[2])
+            points = int(line[3])
+            cost = {"black": int(line[4]),
+                    "red": int(line[5]),
+                    "green": int(line[6]),
+                    "blue": int(line[7]),
+                    "white": int(line[8])}
+            card = Card(parent_surface, cost, gem_count, points, False, category)
+            if deckID not in decks.keys():
+                decks[deckID] = []
+            decks[deckID].append(card)
+        for ID in decks.keys():
+            shuffle(decks[ID])
+        return Table(decks.values())
+
+    def __init__(self, playerIDs, decks = "cards.txt"):
         # creates a new game given supply decks and player IDs
-        self.table = Table(decks)
+        if type(decks) == tyoe("a generic string"):
+            self.table = create_table_from_file(decks)
+        else:
+            self.table = Table(decks)
         self.players = {}
         for ID in playerIDs:
             self.players[ID] = Player(ID, 10)
