@@ -91,126 +91,140 @@ class Card:
     def get_category(self):
         return self.category
 
+    # isClicked
+    def isClicked(self):
+        pass
+
     
 # end of card.py
 
 class Deck:
 
-	def __init__(self, cards = [], category=0, numCardsShown=4, deckID=None):
-		# initializes variables
+    def __init__(self, cards = [], category=0, numCardsShown=4, deckID=None):
+        # initializes variables
 
-		self.cards = cards
-		self.category = category
-		self.deckID = deckID
-		self.numCardsShown = numCardsShown
+        self.cards = cards
+        self.category = category
+        self.deckID = deckID
+        self.numCardsShown = numCardsShown
 
-	def draw_card(self):
-		# removes "top card of deck" and returns it
-		if len(self.cards) == 0:
-			return None
-		return self.cards.pop()
+    def draw_card(self):
+        # removes "top card of deck" and returns it
+        if len(self.cards) == 0:
+            return None
+        return self.cards.pop()
 
-	def get_deckID(self):
-		# returns deck ID
-		return self.deckID
+    def get_deckID(self):
+        # returns deck ID
+        return self.deckID
 
-	def get_numCardsShown(self):
-		# returns the number of cards which are to be dealt out on the table
-		return self.numCardsShown
+    def get_numCardsShown(self):
+        # returns the number of cards which are to be dealt out on the table
+        return self.numCardsShown
 
-	def get_category(self):
-		# returns the category of the cards (should be the same)
-		return self.category
+    def get_category(self):
+        # returns the category of the cards (should be the same)
+        return self.category
 
-	def get_numCards(self):
-		# returns the number of cards in the deck
-		return len(self.cards)
+    def get_numCards(self):
+        # returns the number of cards in the deck
+        return len(self.cards)
 
 class Table:
-	cardsShown = {}
-	supplyDecks = {}
-	players = []
 
-	def __init__(self, decks, list_of_players):
-		# initializes and sets up the table given decks
-		for deck in decks:
-			supplyDecks[deck.deckID] = decks
-			cardsShown[deck.deckID] = []
-		for deckID in supplyDecks.keys():
-			for i in range(supplyDecks[deckID].get_numCardsShown()):
-				if supplyDecks[deckID].get_numCards() > 0:
-					cardsShown[deckID].append(supplyDecks[deckID].draw_card())
-		players = list_of_players
+    def __init__(self, decks):
+                cardsShown = {}
+                supplyDecks = {}
+        # initializes and sets up the table given decks
+        for deck in decks:
+            supplyDecks[deck.deckID] = decks
+            cardsShown[deck.deckID] = []
+        for deckID in supplyDecks.keys():
+            for i in range(supplyDecks[deckID].get_numCardsShown()):
+                if supplyDecks[deckID].get_numCards() > 0:
+                    cardsShown[deckID].append(supplyDecks[deckID].draw_card())
 
-	def pick_card(self, deckID, index):
-		# removes a card shown, replaces it with the top card of its corresponding deck,
-		# and returns the removed card
-		pickedCard = cardsShown[deckID].pop(index)
-		if supplyDecks[deckID].get_numCards() > 0:
-			cardsShown[deckID].insert(index, supplyDecks[deckID].draw_card())
-		return pickedCard
+    def pick_card(self, deckID, index):
+        # removes a card shown, replaces it with the top card of its corresponding deck,
+        # and returns the removed card
+        pickedCard = cardsShown[deckID].pop(index)
+        if supplyDecks[deckID].get_numCards() > 0:
+            cardsShown[deckID].insert(index, supplyDecks[deckID].draw_card())
+        return pickedCard
+
+        def get_cardsShown(self):
+            # gets the cards shown
+            return self.cardsShown
+
+        def get_supplyDecks(self):
+            # gets the supply decks
+            return self.supplyDecks
 
 class Token:
 
-	def __init__(self, gemColor, num=0):
-		# initializes variables
-		self.gemColor = gemColor
-		self.num = num
+    def __init__(self, gemColor, num=0):
+        # initializes variables
+        self.gemColor = gemColor
+        self.num = num
 
-	def get_num(self):
-		# gets the number of tokens
-		return self.num
+    def get_num(self):
+        # gets the number of tokens
+        return self.num
 
-	def get_gemColor(self):
-		# gets the gem color
-		return self.gemColor
+    def get_gemColor(self):
+        # gets the gem color
+        return self.gemColor
 
-	def increase(self, increment):
-		# increases token count
-		self.num += increment
+    def increase(self, increment):
+        # increases token count
+        self.num += increment
 
-	def decrease(self, decrement):
-		# decreases token count
-		self.num -= decrement
+    def decrease(self, decrement):
+        # decreases token count
+        self.num -= decrement
 
 class TokenCache:
 
-	def __init__(self, listOfTokens = [], limit = 10):
-		# initializes the cache from the list of tokens (assuming no two have the same color)
-		self.cache = {}
-		gemColors = ["black", "red", "green", "blue", "white", "gold"]
-		for color in gemColors:
-			self.cache[color] = Token(color)
-		for token in listOfTokens:
-			self.cache[token.get_gemColor()] = Token(token.get_gemColor(), token.get_num())
-		self.limit = limit
+    def __init__(self, listOfTokens = [], limit = 1000000):
+        # initializes the cache from the list of tokens (assuming no two have the same color)
+        self.cache = {}
+        gemColors = ["black", "red", "green", "blue", "white", "gold"]
+        for color in gemColors:
+            self.cache[color] = Token(color)
+        for token in listOfTokens:
+            self.cache[token.get_gemColor()] = Token(token.get_gemColor(), token.get_num())
+        self.limit = limit
 
-	def get_num(self, color):
-		# gets the number of tokens of a color
-		return self.cache[color].get_num()
+    def get_num(self, color):
+        # gets the number of tokens of a color
+        return self.cache[color].get_num()
 
-	def get_total_num(self):
-		# gets the total number of tokens
-		return sum([self.get_num(color) for color in self.cache.keys()])
+    def get_total_num(self):
+        # gets the total number of tokens
+        return sum([self.get_num(color) for color in self.cache.keys()])
 
-	def receive(self, increment):
-		# attempts to increase token count, where increment is a TokenCache
-		# returns True if successful ("increment" should not be used again)
-		# returns False if token limit is reached (usually meaning the player has to get rid of some tokens)
-		for color in get_colors().keys():
-			self.cache[color].increase(increment.get_num(color))
-		return self.get_total_num() <= self.limit
+    def receive(self, increment):
+        # attempts to increase token count, where increment is a TokenCache
+        # returns True if successful
+        # returns False if token limit is reached (usually meaning the player has to get rid of some tokens)
+        for color in get_colors().keys():
+            self.cache[color].increase(increment.get_num(color))
+        return self.get_total_num() <= self.limit
 
-	def give(self, decrement):
-		# attempts to decrease token count, where decrement is a TokenCache
-		# returns True if successful ("decrement" is now a carrier)
-		# returns False if not enough tokens; the giving does not happen
-		for color in get_colors().keys():
-			if self.get_num(color) < decrement.get_num(color):
-				return False
-		for color in get_colors().keys():
-			self.cache[color].decrease(decrement.get_num(color))
-		return True
+    def give(self, decrement):
+        # attempts to decrease token count, where decrement is a TokenCache
+        # returns True if successful
+        # returns False if not enough tokens; the giving does not happen
+        # Note: always run the giving function before the receiving function
+        for color in get_colors().keys():
+            if self.get_num(color) < decrement.get_num(color):
+                return False
+        for color in get_colors().keys():
+            self.cache[color].decrease(decrement.get_num(color))
+        return True
+
+    def numSelected(self):
+        pass
 
 class CardCache:
 
@@ -257,13 +271,13 @@ class CardCache:
 
 class Player:
 
-    def __init__(self, ID, reserveLimit = 3):
+    def __init__(self, ID, reserveLimit = 3, tokenLimit = 10):
         # initialize variables to defaults for a player
         # (will need to implement nobles)
         # (will need to implement a one-use cardCache for expansion)
         self.ID = ID
         self.reserveLimit = reserveLimit
-        self.tokenCache = TokenCache()
+        self.tokenCache = TokenCache([], tokenLimit)
         self.cardCache = CardCache()
         self.reservedCards = []
 
@@ -298,6 +312,16 @@ class Player:
         # (will need to modify once nobles is implemented)
         return self.cardCache.get_num_points()
 
+    def gainTokens(self, tokens):
+        # gains the given tokens (TokenCache object)
+        # returns false if limit exceeded, true otherwise
+        return self.tokenCache.receive(tokens)
+
+    def giveTokens(self, tokens):
+        # gives the given tokens (TokenCache object)
+        # returns true if successful, false if unsuccessful
+        return self.tokenCache.give(tokens)
+
     def gainCard(self, card):
         # gains card into cardCache
         self.cardCache.add_card(card)
@@ -309,6 +333,111 @@ class Player:
             return False
         self.reservedCards.append(card)
         return True
+
+    def gainReserveCard(self, index):
+        # gains card in reserves
+        card = self.reservedCards.pop(index)
+        self.gainCard(card)
+
+class Game:
+
+    def __init__(self, decks, playerIDs):
+        # creates a new game given supply decks and player IDs
+        self.table = Table(decks)
+        self.players = {}
+        for ID in playerIDs:
+            self.players[ID] = Player(ID, 10)
+        self.turn_list = playerIDs
+        self.turn_index = 0
+        self.tokenBank = TokenCache([Token(color), 7])
+        self.finalStage = [0 for player in self.playerIDs]
+        self.tokenLimitExceeded = False
+
+    def get_turn(self):
+        # Gets whose turn it is
+        return self.turn_list[self.turn_index]
+
+    def isTokenLimitExceeded(self):
+        # Gets the tokenLimitExceeded variable
+
+    def get_finalStage(self):
+        # Gets the state of the final stage of the game ([0,0,0,0] for "is not in final stage")
+        return self.finalStage
+
+    def get_relativePos(self, player):
+        # Gets the relative positions of the players in the frame of given player
+        pass
+
+    def isOver(self):
+        # Determines whether the game is over
+        return self.finalStage == [1,1,1,1]
+
+    def next_turn(self):
+        # Goes to the next player's turn
+        if self.players[self.get_turn()].get_points() >= 15 or sum(self.finalStage) > 0:
+            self.finalStage[self.turn_index] = 1
+        self.turn_index = (self.turn_index + 1) % len(self.turn_list)
+
+    def turn_tokenDraw(self, tokens):
+        # Player uses turn to gain tokens from bank (tokens is a TokenCache object)
+        # Returns 1 (true) if successful, 0 (false) if not, and will not do if false
+        # Returns 2 if token limit is exceeded
+        player = self.players[self.get_turn()]
+        gemColors = ["black", "red", "green", "blue", "white", "gold"]
+        if self.tokens.get_num("gold") > 0:
+            return False
+        distribution = sorted([self.tokens.get_num(color) for color in gemColors])
+        greatestGem = ""
+        for color in gemColors:
+            if self.tokens.get_num(color) == distribution[-1]:
+                greatestGem = color
+        if not (distribution == [0,0,0,1,1,1] or (distribution == [0,0,0,0,0,2] and self.tokenBank.get_num(greatestGem) >= 4)):
+            return False
+        if not self.tokenBank.give():
+            return False
+        return 2 - (player.gainTokens(tokens))
+
+    def turn_buyTableCard(self, deckID, index, tokens):
+        # Player uses turn to buy a card from among the shown cards (tokens is a TokenCache object)
+        # Returns true if successful, false if not, and will not do if false
+        pass
+
+    def turn_buyReserveCard(self, index, tokens):
+        # Player uses turn to buy a card in reserve (tokens is a TokenCache object)
+        # Returns true if successful, false if not, and will not do if false
+        pass
+
+    def turn_reserveCard(self, deckID, index):
+        # Player uses turn to reserve a card
+        # Returns true if successful, false if not, and will not do if false
+        pass
+
+    def turn_returnTokens(self, tokens):
+        # Player returns some tokens to the bank (tokens is a TokenCache object)
+        # Returns true if successful, false if not, and will not do if false
+        pass
+
+    def handle_turn(self, turn_type, parameters):
+        # Handles a player's turn using the "turn" functions
+        # Does not use the turn if such function returns false
+        # Returns true if turn is complete, false if unsuccessful or if player is to return tokens
+        if self.tokenLimitExceeded:
+            good = self.turn_returnTokens(parameters[0])
+        if turn_type == "tokenDraw":
+            good = self.turn_tokenDraw(parameters[0])
+        if turn_type == "buyTableCard":
+            good = self.turn_buyTableCard(parameters[0], parameters[1], parameters[2])
+        if turn_type == "buyReserveCard":
+            good = self.turn_buyReserveCard(parameters[0], parameters[1])
+        if turn_type == "reserveCard":
+            good = self.turn_reserveCard(parameters[0], parameters[1])
+        if good == 2:
+            self.tokenLimitExceeded = True
+            good = False
+        if good:
+            self.tokenLimitExceeded = False
+            self.next_turn()
+        return good
 
 some_cost = {"black": 0,
             "red": 0,
