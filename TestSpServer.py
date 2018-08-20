@@ -2,8 +2,24 @@ import sys
 from time import sleep, localtime
 from weakref import WeakKeyDictionary
 
+from card import Card
+
 from PodSixNet.Server import Server
 from PodSixNet.Channel import Channel
+
+cost = {"black": 1,
+        "red": 1,
+        "green": 0,
+        "blue": 0,
+        "white": 0}
+gem_count = {"black": 1,
+        "red": 0,
+        "green": 0,
+        "blue": 0,
+        "white": 0,
+        "gold": 0}
+c = [cost, gem_count, 0, False, 1, [100, 100]]
+
 
 class ClientChannel(Channel):
     """
@@ -23,8 +39,11 @@ class ClientChannel(Channel):
     def Network_message(self, data):
         if data['message'] == "gg ez":
             data['message'] = 'OMEGALUL'
-        self._server.SendToAll({"action": "message", "message": data['message'], "who": self.nickname})
-    
+
+        if data['message'] == 'card':
+            self._server.SendToAll({"action": "table", "table": c})
+        else:
+            self._server.SendToAll({"action": "message", "message": data['message'], "who": self.nickname})
     def Network_nickname(self, data):
         self.nickname = data['nickname']
         self._server.SendPlayers()
