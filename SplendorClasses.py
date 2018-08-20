@@ -326,10 +326,14 @@ class Player:
         # gains card into cardCache
         self.cardCache.add_card(card)
 
+    def canReserveCard(self):
+        # returns whether a card may be reserved
+        return len(self.reservedCards) >= reserveLimit
+
     def reserveCard(self, card):
         # reserves card into reservedCards, up to reserveLimit (in which card will not be reserved)
         # returns True if successful, False if unsuccessful
-        if len(self.reservedCards) >= 3:
+        if not self.canReserveCard():
             return False
         self.reservedCards.append(card)
         return True
@@ -408,10 +412,21 @@ class Game:
         pass
 
     def turn_reserveCard(self, deckID, index):
-        # Player uses turn to reserve a card
-        # Returns true if successful, false if not, and will not do if false
-        pass
-
+        # Player uses turn to buy a card in reserve (tokens is a TokenCache object)
+        # Returns 1 (true) if successful, 0 (false) if not, and will not do if false
+        # Returns 2 if token limit is exceeded
+        player = self.players[self.get_turn()]
+        if not player.canReserveCard():
+            return False
+        card = self.table.pick_card(deckID, index)
+        player.gainCard(card)
+        good = 1
+        if self.tokenBank.get_num("gold") > 0:
+            goldToken = Token("gold", 1)
+            goldTokenCache = TokenCache([goldToken])
+            good = 2 - (player.gainTokens(goldTokenCache))
+        return good
+            
     def turn_returnTokens(self, tokens):
         # Player returns some tokens to the bank (tokens is a TokenCache object)
         # Returns true if successful, false if not, and will not do if false
