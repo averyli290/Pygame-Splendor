@@ -52,7 +52,7 @@ class Card:
         textcolor = (200,200,200); font = pygame.font.get_default_font(); italic = True; rotation=0
 
         for color in self.cost:
-            if self.cost[color] > 0:
+            if self.cmst[color] > 0:
                 TextSurf, TextRect = display_text(str(self.cost[color]),self.font_size0,font,textcolor,italic,rotation)
                 textwidth, textheight = TextSurf.get_size()
                 drawx = int(textwidth)
@@ -162,10 +162,31 @@ class Table:
 
 class Token:
 
-    def __init__(self, gemColor, num=0):
+    default_font_size = 15
+    color_dict = get_colors()
+
+    def __init__(self, parent_surface, gemColor, num=0, coords=[0,0], radius=81); 
+
         # initializes variables
         self.gemColor = gemColor
         self.num = num
+        self.coords = coords
+        self.radius = radius
+        self.font_size = self.default_font_size*radius/81
+        self.parent_surface = parent_surface
+
+        # Creating the surface
+        self.surface = pygame.Surface((radius, radius))
+        self.surface_color = self.color_dict[self.gemColor]
+        self.surface.fill(self.surface_color)
+
+    def draw(self):
+        # Draws token onto the parent surface
+        self.parent_surface.blit(self.surface, coords)
+
+    def set_coords(self, new_coords):
+        # Sets the coords to the new position
+        self.coords = new_coords
 
     def get_num(self):
         # gets the number of tokens
