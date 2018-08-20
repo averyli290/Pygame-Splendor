@@ -129,8 +129,9 @@ class Deck:
 class Table:
 	cardsShown = {}
 	supplyDecks = {}
+	players = []
 
-	def __init__(self, decks):
+	def __init__(self, decks, list_of_players):
 		# initializes and sets up the table given decks
 		for deck in decks:
 			supplyDecks[deck.deckID] = decks
@@ -139,6 +140,7 @@ class Table:
 			for i in range(supplyDecks[deckID].get_numCardsShown()):
 				if supplyDecks[deckID].get_numCards() > 0:
 					cardsShown[deckID].append(supplyDecks[deckID].draw_card())
+		players = list_of_players
 
 	def pick_card(self, deckID, index):
 		# removes a card shown, replaces it with the top card of its corresponding deck,
@@ -217,8 +219,7 @@ class CardCache:
         # will need to implement a one-use-card cache (for expansion)
         self.cache = {}
         gemColors = ["black", "red", "green", "blue", "white", "gold"]
-        for color in gemColors:
-            self.cache[color] = []
+        self.cache = {color: [] for color in gemColors}
         for card in listOfCards:
             # currently assumes only one kind of gem at a time
             gem_count = card.get_gem_count()

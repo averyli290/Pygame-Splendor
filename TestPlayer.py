@@ -48,6 +48,7 @@ class Client(ConnectionListener):
     def Network_message(self, data):
         if data['action'] == 'message':
             print(data['who'] + ": " + data['message'])
+            
     def Network_table(self, data):
         if data['action'] == "table":
             info = data['table']
