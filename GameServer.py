@@ -2,8 +2,8 @@ import sys
 from time import sleep, localtime
 from weakref import WeakKeyDictionary
 
-from card import Card
 from SplendorClasses import *
+from game import Game
 
 from PodSixNet.Server import Server
 from PodSixNet.Channel import Channel

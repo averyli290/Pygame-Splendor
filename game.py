@@ -31,7 +31,7 @@ class Game:
 
     def __init__(self, playerIDs, decks = "cards.txt"):
         # creates a new game given supply decks and player IDs
-        if type(decks) == tyoe("a generic string"):
+        if type(decks) == type("a generic string"):
             self.table = create_table_from_file(decks)
         else:
             self.table = Table(decks)
@@ -47,17 +47,18 @@ class Game:
     def get_turn(self):
         # Gets whose turn it is
         return self.turn_list[self.turn_index]
+    
+    def get_card_coords(self):
+        # Returns all of the positions of the cards to be displayed on the screen for each player
+        return None
 
     def isTokenLimitExceeded(self):
         # Gets the tokenLimitExceeded variable
+        return self.tokenLimitExceeded
 
     def get_finalStage(self):
         # Gets the state of the final stage of the game ([0,0,0,0] for "is not in final stage")
         return self.finalStage
-
-    def get_relativePos(self, player):
-        # Gets the relative positions of the players in the frame of given player
-        pass
 
     def isOver(self):
         # Determines whether the game is over
