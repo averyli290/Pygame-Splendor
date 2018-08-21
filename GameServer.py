@@ -2,8 +2,8 @@ import sys
 from time import sleep, localtime
 from weakref import WeakKeyDictionary
 
-from card import Card
 from SplendorClasses import *
+from game import Game
 
 from PodSixNet.Server import Server
 from PodSixNet.Channel import Channel
@@ -26,7 +26,7 @@ class ClientChannel(Channel):
     
     def Network_message(self, data):
         if data['message'] == "gg ez":
-            data['message'] = 'Great game everyone!'
+            data['message'] = 'Mommy says that people my age shouldn\'t suck their thumbs.'
 
     def Network_nickname(self, data):
         self.nickname = data['nickname']
