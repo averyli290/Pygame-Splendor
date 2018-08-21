@@ -5,6 +5,8 @@ from SplendorClasses import *
 
 class Game:
 
+    gemColors = ["black", "red", "green", "blue", "white", "gold"]
+
     def create_table_from_file(self, filename):
         decks = {}
         with open(filename, ('r')) as f:
@@ -50,6 +52,7 @@ class Game:
 
     def isTokenLimitExceeded(self):
         # Gets the tokenLimitExceeded variable
+        return self.tokenLimitExceeded
 
     def get_finalStage(self):
         # Gets the state of the final stage of the game ([0,0,0,0] for "is not in final stage")
@@ -69,6 +72,18 @@ class Game:
             self.finalStage[self.turn_index] = 1
         self.turn_index = (self.turn_index + 1) % len(self.turn_list)
 
+    def canAfford(player, cost, gems_spent = TokenCache()):
+        # Determines whether the player's cards and the gems spent cover the cost (of a card)
+        total_gems = TokenCache()
+        gemColors = ["black", "red", "green", "blue", "white", "gold"]
+        for color in gemColors:
+            total_gems.receive(player.get_tokens())
+            total_gems.receive(gems_spent())
+        total_deficit = 0
+        for color in gemColors[:5]:
+            total_deficit += max(0, cost.get_num(color) - total_gems.get_num(color))
+        return total_deficit <= total_gems.get_num("gold")
+
     def turn_tokenDraw(self, tokens):
         # Player uses turn to gain tokens from bank (tokens is a TokenCache object)
         # Returns 1 (true) if successful, 0 (false) if not, and will not do if false
@@ -84,19 +99,41 @@ class Game:
                 greatestGem = color
         if not (distribution == [0,0,0,1,1,1] or (distribution == [0,0,0,0,0,2] and self.tokenBank.get_num(greatestGem) >= 4)):
             return False
-        if not self.tokenBank.give():
+        if not self.tokenBank.give(tokens):
             return False
         return 2 - (player.gainTokens(tokens))
 
     def turn_buyTableCard(self, deckID, index, tokens):
         # Player uses turn to buy a card from among the shown cards (tokens is a TokenCache object)
         # Returns true if successful, false if not, and will not do if false
-        pass
+        player = self.players[self.get_turn()]
+        gemColors = ["black", "red", "green", "blue", "white", "gold"]
+        card = self.table.get_cardsShown()[deckID][index]
+        cost_dict = card.get_cost()
+        cost = TokenCache([Token(color, cost_dict[color]) for color in gemColors[:5]])
+        if not canAfford(player, cost, tokens):
+            return False
+        if not player.giveTokens(tokens):
+            return False
+        self.tokenBank.receive(tokens)
+        player.gainCard(self.table.pick_card(deckID, index))
+        return True
 
     def turn_buyReserveCard(self, index, tokens):
         # Player uses turn to buy a card in reserve (tokens is a TokenCache object)
         # Returns true if successful, false if not, and will not do if false
-        pass
+        player = self.players[self.get_turn()]
+        gemColors = ["black", "red", "green", "blue", "white", "gold"]
+        card = player.get_reservedCards[index]
+        cost_dict = card.get_cost()
+        cost = TokenCache([Token(color, cost_dict[color]) for color in gemColors[:5]])
+        if not canAfford(player, cost, tokens):
+            return False
+        if not player.giveTokens(tokens):
+            return False
+        self.tokenBank.receive(tokens)
+        player.gainCard(player.pickReservedCard(index))
+        return True
 
     def turn_reserveCard(self, deckID, index):
         # Player uses turn to buy a card in reserve (tokens is a TokenCache object)
@@ -117,7 +154,13 @@ class Game:
     def turn_returnTokens(self, tokens):
         # Player returns some tokens to the bank (tokens is a TokenCache object)
         # Returns true if successful, false if not, and will not do if false
-        pass
+        player = self.players[self.get_turn()]
+        if self.player.get_tokens().get_total_num() - tokens.get_total_num() != player.get_tokens().get_limit():
+            return False
+        if not self.player.give(tokens):
+            return False
+        self.tokenBank.receive(tokens)
+        return True
 
     def handle_turn(self, turn_type, parameters):
         # Handles a player's turn using the "turn" functions

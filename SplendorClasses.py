@@ -153,13 +153,13 @@ class Table:
             cardsShown[deckID].insert(index, supplyDecks[deckID].draw_card())
         return pickedCard
 
-        def get_cardsShown(self):
-            # gets the cards shown
-            return self.cardsShown
+    def get_cardsShown(self):
+        # gets the cards shown
+        return self.cardsShown
 
-        def get_supplyDecks(self):
-            # gets the supply decks
-            return self.supplyDecks
+    def get_supplyDecks(self):
+        # gets the supply decks
+        return self.supplyDecks
 
 class Token:
 
@@ -203,6 +203,10 @@ class TokenCache:
     def get_total_num(self):
         # gets the total number of tokens
         return sum([self.get_num(color) for color in self.cache.keys()])
+
+    def get_limit(self):
+        # gets the token limit
+        return self.limit
 
     def receive(self, increment):
         # attempts to increase token count, where increment is a TokenCache
@@ -338,6 +342,10 @@ class Player:
             return False
         self.reservedCards.append(card)
         return True
+
+    def removeReservedCard(self, index):
+        # removes and returns the card of that index in the reserved cards
+        return self.reservedCards.pop(index)
 
     def gainReserveCard(self, index):
         # gains card in reserves
