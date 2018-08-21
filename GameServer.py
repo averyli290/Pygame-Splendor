@@ -26,7 +26,7 @@ class ClientChannel(Channel):
     
     def Network_message(self, data):
         if data['message'] == "gg ez":
-            data['message'] = 'Great game everyone!'
+            data['message'] = 'Mommy says that people my age shouldn\'t suck their thumbs.'
 
     def Network_nickname(self, data):
         self.nickname = data['nickname']
