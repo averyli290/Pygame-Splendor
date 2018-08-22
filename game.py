@@ -11,9 +11,14 @@ class Game:
         decks = {}
         with open(filename, ('r')) as f:
             line = f.readline().split(',')
+            line[0] = eval(line[0])
+            line[-1] = line[-1][0]
+            print(line)
             # color(s) (for gem_count), category, deckID, points, "black", "red", "green", "blue", "white"
             gemColors = ["black", "red", "green", "blue", "white", "gold"]
-            gem_count = {color: 0 for color in gemColors}
+            gem_count = {}
+            for color in get_colors():
+                gem_count[color] = 0
             gem_count[line[0]] += 1
             category = int(line[1])
             deckID = int(line[2])
@@ -24,17 +29,17 @@ class Game:
                     "blue": int(line[7]),
                     "white": int(line[8])}
             card = Card(parent_surface, cost, gem_count, points, False, category)
-            if deckID not in decks.keys():
+            if deckID not in decks:
                 decks[deckID] = []
             decks[deckID].append(card)
-        for ID in decks.keys():
+        for ID in decks:
             shuffle(decks[ID])
         return Table(decks.values())
 
     def __init__(self, playerIDs, decks = "cards.txt"):
         # creates a new game given supply decks and player IDs
         if type(decks) == type("a generic string"):
-            self.table = create_table_from_file(decks)
+            self.table = self.create_table_from_file(decks)
         else:
             self.table = Table(decks)
         self.players = {}
@@ -50,8 +55,15 @@ class Game:
         # Gets whose turn it is
         return self.turn_list[self.turn_index]
     
-    def get_card_coords(self):
+    def get_cards_shown(self):
         # Returns all of the positions of the cards to be displayed on the screen for each player
+
+        to_display = {(playerID,[]) for playerID in self.player.keys()}
+        for playerID in to_display:
+            for c in self.table.get_cardsShown():
+                info = (None,c.get_cost(),c.get_gem_count(),c.get_points(),c.get_category(),c.get_size()[0],c.get_size()[1])
+                to_display[playerID].append(info)
+            
         return None
 
     def isTokenLimitExceeded(self):
@@ -64,7 +76,7 @@ class Game:
 
     def isOver(self):
         # Determines whether the game is over
-        return self.finalStage == [1,1,1,1]
+        return self.finalStage[self.turn_index] == 1
 
     def next_turn(self):
         # Goes to the next player's turn
@@ -183,3 +195,6 @@ class Game:
             self.tokenLimitExceeded = False
             self.next_turn()
         return good
+
+
+a = Game([12345])

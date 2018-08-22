@@ -51,14 +51,14 @@ class Client(ConnectionListener):
         if data['action'] == 'message':
             print(data['who'] + ": " + data['message'])
             
-    def Network_print_table_cards(self, data):
+    def Network_table_cards(self, data):
         # Prints the cards based on the given data
         if data['action'] == "table_cards":
             for details in data["table_cards"]:
                 c = Card(game_surface,details[0],details[1],details[2],details[3],details[4],details[5],details[6],details[7])
                 c.draw()
     
-    def Network_print_table_tokens(self, data):
+    def Network_table_tokens(self, data):
         # Prints the tokens based on the given data
         if data['action'] == "table_cards":
             for details in data["table_cards"]:
@@ -71,7 +71,7 @@ class Client(ConnectionListener):
         print("You are now connected to the server")
     
     def Network_error(self, data):
-        print('error:', data['error'][1])
+        print('error:', data['error'])
         connection.Close()
     
     def Network_disconnected(self, data):
