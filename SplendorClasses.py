@@ -11,7 +11,7 @@ class Card:
     
     colors = get_colors()
 
-    def __init__(self, parent_surface, cost, gem_count, points=0, one_use_only=False, category=0, coords=[0,0], width=141, height=200):
+    def __init__(self, parent_surface, cost, gem_count, points=0, one_use_only=False, category=0, width=141, height=200, coords=[0,0]):
         # Sets up all of the variable needed for the card 
         # Creating the surface for the card
 
@@ -162,39 +162,11 @@ class Table:
         return self.supplyDecks
 
 class Token:
-        
-    default_font_size = 11
-    color_dict = get_colors()
 
-    def __init__(self, parent_surface, gemColor, num=0, coords=[0,0], radius=81):
+    def __init__(self, gemColor, num=0):
         # initializes variables
-        self.parent_surface = self.parent_surface
         self.gemColor = gemColor
         self.num = num
-        self.coords = coords 
-        self.radius = radius
-        self.surface = pygame.Surface((radius*2, radius*2), pygame.SRC_ALPHA)
-        self.surface.set_colorkey((255,0,255)) # THIS COLOR IS TRANSPARENT ON THIS SURFACE
-        self.font_size = default_font_size*radius/81
-        self.token_color = self.color_dict[gemColor]
-
-    def draw(self, rotation=0):
-        # Draws the token onto the surface with the rotation specified
-        self.surface.fill((255,0,255))
-        pygame.draw.circle(self.surface, (0,0,0), (self.radius, self.radius), self.radius)
-        pygame.draw.circle(self.surface, self.token_color, (self.radius, self.radius), int(self.radius*0.9))
-        text = str(num)
-        font_size = self.font_size
-        font = pygame.font.get_default_font() 
-        text_color = (200,200,200)
-        italic=False
-        TextSurf, TextRect = (text,font_size,font,text_color,italic,rotation)
-        self.surface.blit((self.surface.get_width()-TextSurf.get_width())//2, (self.surface.get_height()-TextSurf.get_height())//2)
-        self.parent_surface.blit(surface, coords)
-
-    def set_coords(self, new_coords):
-        # Sets the coordinate variable to the specified coords
-        self.coords = new_coords
 
     def get_num(self):
         # gets the number of tokens
@@ -371,7 +343,7 @@ class Player:
         self.reservedCards.append(card)
         return True
 
-    def removeReservedCard(self, index):
+    def pickReserveCard(self, index):
         # removes and returns the card of that index in the reserved cards
         return self.reservedCards.pop(index)
 
