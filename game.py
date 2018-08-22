@@ -60,8 +60,23 @@ class Game:
     def get_cards(self):
         # Returns all of the cards to be displayed on the screen for each player
         # Send tuple with data and coords depending on player
-        return_me = {(playerID, []) for playerID in self.players.keys()}
-        return None
+        #return_me = {(playerID, []) for playerID in self.players.keys()}
+        return_me={}
+        print(self.players)
+        for p in self.players:
+            return_me[p] = [({"black": 1,
+                                    "red":1,
+                                    "green":0,
+                                    "blue":0,
+                                    "white":0},
+                                    {"black": 1,
+                                    "red":0,
+                                    "green":0,
+                                    "blue":0,
+                                    "white":0,
+                                    "gold":0},
+                                    1,False,1,141, 200)]
+        return return_me 
 
     def isTokenLimitExceeded(self):
         # Gets the tokenLimitExceeded variable

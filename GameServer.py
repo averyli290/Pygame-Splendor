@@ -27,17 +27,20 @@ class ClientChannel(Channel):
     def Network_message(self, data):
         if data['message'] == "gg ez":
             data['message'] = 'Mommy says that people my age shouldn\'t suck their thumbs.'
+        self._server.SendToAll({"action":"message","message":data['message'],"who":self.nickname})
+        self._server.SendTable_Cards()
 
     def Network_nickname(self, data):
         self.nickname = data['nickname']
         self._server.SendPlayers()
+
 
 class GameServer(Server):
     channelClass = ClientChannel
     
     def __init__(self, *args, **kwargs):
         Server.__init__(self, *args, **kwargs)
-        self.players = {}
+        self.players = WeakKeyDictionary() 
         print('Server launched')
         self.games = []
     
@@ -46,11 +49,10 @@ class GameServer(Server):
     
     def AddPlayer(self, player):
         print("New Player" + str(player.addr))
-        self.players[player] = Player(player.addr)
+        self.players[player] = player.addr
         self.SendPlayers()
-        print("players", [p for p in self.players])
         if len(self.players) == 1:
-            self.games += [Game(self.players[player])]
+            self.games += [Game([p.nickname for p in self.players])]
 
     def DelPlayer(self, player):
         print("Deleting Player" + str(player.addr))
@@ -63,8 +65,8 @@ class GameServer(Server):
     def SendToAll(self, data):
         [p.Send(data) for p in self.players]
 
-    def SendTable_Cards(self, data):
-        self.SendToAll({"action": "table_cards", "table_cards": [g.get_cards_shown()[playerID] for playerID in self.players.keys()]})
+    def SendTable_Cards(self):
+        self.SendToAll({"action": "table_cards", "table_cards": self.games[0].get_cards()})
     '''
     def SendTable_Tokens(self, data):
         self.SendToAll({"action": "table_tokens", "table_tokens": [g.get_tokens_shown()[playerID] for playerID in self.players.keys()]})

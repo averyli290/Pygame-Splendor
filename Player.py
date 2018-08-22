@@ -24,8 +24,8 @@ class Client(ConnectionListener):
         print("Chat client started")
         print("Ctrl-C to exit")
         # get a nickname from the user before starting
-        print("Enter your nickname: ")
-        connection.Send({"action": "nickname", "nickname": stdin.readline().rstrip("\n")})
+        self.nickname = str(input("Enter your nickname: "))
+        connection.Send({"action": "nickname", "nickname": self.nickname})
         # launch our threaded input loop
         t = start_new_thread(self.InputLoop, ())
 
@@ -54,8 +54,8 @@ class Client(ConnectionListener):
     def Network_table_cards(self, data):
         # Prints the cards based on the given data
         if data['action'] == "table_cards":
-            for details in data["table_cards"]:
-                c = Card(game_surface,details[0],details[1],details[2],details[3],details[4],details[5],details[6],details[7])
+            for details in data["table_cards"][self.nickname]:
+                c = Card(game_surface,details[0],details[1],details[2],details[3],details[4],details[5],details[6])
                 c.draw()
     
     def Network_table_tokens(self, data):
@@ -91,3 +91,4 @@ else:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
+        pygame.display.flip()
