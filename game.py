@@ -10,31 +10,33 @@ class Game:
     def create_table_from_file(self, filename):
         decks = {}
         with open(filename, ('r')) as f:
-            line = f.readline().split(',')
-            line[0] = eval(line[0])
-            line[-1] = line[-1][0]
-            print(line)
-            # color(s) (for gem_count), category, deckID, points, "black", "red", "green", "blue", "white"
-            gemColors = ["black", "red", "green", "blue", "white", "gold"]
-            gem_count = {}
-            for color in get_colors():
-                gem_count[color] = 0
-            gem_count[line[0]] += 1
-            category = int(line[1])
-            deckID = int(line[2])
-            points = int(line[3])
-            cost = {"black": int(line[4]),
-                    "red": int(line[5]),
-                    "green": int(line[6]),
-                    "blue": int(line[7]),
-                    "white": int(line[8])}
-            card = Card(parent_surface, cost, gem_count, points, False, category)
-            if deckID not in decks:
-                decks[deckID] = []
-            decks[deckID].append(card)
-        for ID in decks:
+            line = f.readline().split(' ')
+            while line != [""]:
+                # color(s) (for gem_count), category, deckID, points, "black", "red", "green", "blue", "white"
+                gemColors = ["black", "red", "green", "blue", "white", "gold"]
+                gem_count = {color: 0 for color in gemColors}
+                gem_count[line[0]] += 1
+                category = int(line[1])
+                deckID = int(line[2])
+                points = int(line[3])
+                parent_surface = None
+                cost = {"black": int(line[4]),
+                        "red": int(line[5]),
+                        "green": int(line[6]),
+                        "blue": int(line[7]),
+                        "white": int(line[8])}
+                card = Card(parent_surface, cost, gem_count, points, False, category)
+                if deckID not in decks.keys():
+                    decks[deckID] = []
+                decks[deckID].append(card)
+                line = f.readline().split(' ')
+        for ID in decks.keys():
             shuffle(decks[ID])
-        return Table(decks.values())
+        decks_actual = []
+        for ID in decks.keys():
+            deck_actual = Deck(decks[ID], decks[ID][0].get_category(), 4, ID)
+            decks_actual.append(deck_actual)
+        return Table(decks_actual)
 
     def __init__(self, playerIDs, decks = "cards.txt"):
         # creates a new game given supply decks and player IDs
@@ -47,30 +49,18 @@ class Game:
             self.players[ID] = Player(ID, 10)
         self.turn_list = playerIDs
         self.turn_index = 0
-        self.tokenBank = TokenCache([Token(color), 7])
-        self.finalStage = [0 for player in self.playerIDs]
+        self.tokenBank = TokenCache([Token(color, 7) for color in self.gemColors])
+        self.finalStage = [0 for player in playerIDs]
         self.tokenLimitExceeded = False
 
     def get_turn(self):
         # Gets whose turn it is
         return self.turn_list[self.turn_index]
     
-<<<<<<< HEAD
     def get_cards(self):
         # Returns all of the cards to be displayed on the screen for each player
         # Send tuple with data and coords depending on player
         return_me = {(playerID, []) for playerID in self.players.keys()}
-=======
-    def get_cards_shown(self):
-        # Returns all of the positions of the cards to be displayed on the screen for each player
-
-        to_display = {(playerID,[]) for playerID in self.player.keys()}
-        for playerID in to_display:
-            for c in self.table.get_cardsShown():
-                info = (None,c.get_cost(),c.get_gem_count(),c.get_points(),c.get_category(),c.get_size()[0],c.get_size()[1])
-                to_display[playerID].append(info)
-            
->>>>>>> be9835b5e0b48885eb477d65bbaf24c8850053f4
         return None
 
     def isTokenLimitExceeded(self):
@@ -78,7 +68,7 @@ class Game:
         return self.tokenLimitExceeded
 
     def get_finalStage(self):
-        # Gets the state of the final stage of the game ([0,0,0,0] for "is not in final stage")
+        # Gets the state of the final stage of the game ([0,0,...,0] for "is not in final stage")
         return self.finalStage
 
     def isOver(self):
@@ -203,5 +193,4 @@ class Game:
             self.next_turn()
         return good
 
-
-a = Game([12345])
+a = Game([])

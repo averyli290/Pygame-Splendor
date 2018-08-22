@@ -147,7 +147,7 @@ class Table:
         supplyDecks = {}
         # initializes and sets up the table given decks
         for deck in decks:
-            supplyDecks[deck.deckID] = decks
+            supplyDecks[deck.deckID] = deck
             cardsShown[deck.deckID] = []
         for deckID in supplyDecks.keys():
             for i in range(supplyDecks[deckID].get_numCardsShown()):
