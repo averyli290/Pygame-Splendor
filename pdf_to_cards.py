@@ -40,7 +40,7 @@ for i in range(5):
     j = 150 * i
     for k in range(18):
         c = [1,1,1,1,1,1,1,1,2,2,2,2,2,2,3,3,3,3]
-        card = [text[j+2].lower(), str(c[k]), str(c[k]), text[j+k+21], text[j+k+55], text[j+k+74], text[j+k+93], text[j+k+112], text[j+k+131]]
+        card = [text[j+2].lower(), str(c[k]), str(c[k]), text[j+k+21], text[j+k+55], text[j+k+93], text[j+k+131], text[j+k+112], text[j+k+74]]
         cards.append(card)
 
 with open("cards.txt", "w") as f:
