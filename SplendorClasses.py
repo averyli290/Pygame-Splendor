@@ -80,6 +80,9 @@ class Card:
         self.coords[0], self.coords[1] = new_coords[0], new_coords[1]
 
     # Getters
+    def get_coords(self):
+        return self.coords
+
     def get_cost(self):
         return self.cost
 
@@ -88,9 +91,15 @@ class Card:
 
     def get_points(self):
         return self.points
+    
+    def get_one_use_only(self):
+        return self.one_use_only
 
     def get_category(self):
         return self.category
+    
+    def get_size(self):
+        return (self.width,self.height)
 
     # isClicked
     def isClicked(self):
