@@ -50,8 +50,10 @@ class Game:
         # Gets whose turn it is
         return self.turn_list[self.turn_index]
     
-    def get_card_coords(self):
-        # Returns all of the positions of the cards to be displayed on the screen for each player
+    def get_cards(self):
+        # Returns all of the cards to be displayed on the screen for each player
+        # Send tuple with data and coords depending on player
+        return_me = {(playerID, []) for playerID in self.players.keys()}
         return None
 
     def isTokenLimitExceeded(self):
