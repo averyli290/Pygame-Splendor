@@ -60,14 +60,14 @@ class Client(ConnectionListener):
         # Prints the cards based on the given data
         if data['action'] == "table_cards":
             for details in data["table_cards"][self.addr]:
-                c = Card(game_surface,details[0],details[1],details[2],details[3],details[4],details[5],details[6])
+                c = Card(details[0],details[1],details[2],details[3],details[4],game_surface,details[5],details[6],details[7])
                 c.draw()
     
     def Network_table_tokens(self, data):
         # Prints the tokens based on the given data
-        if data['action'] == "table_cards":
-            for details in data["table_cards"]:
-                t = Token(game_surface,details[0],details[1],details[2],details[3],details[4],details[5],details[6],details[7])
+        if data['action'] == "table_tokens":
+            for details in data["table_tokens"][self.addr]:
+                t = Token(details[0],details[1],game_surface,details[2],details[3])
                 t.draw()
 
     # built in stuff

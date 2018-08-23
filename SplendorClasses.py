@@ -11,7 +11,7 @@ class Card:
     
     colors = get_colors()
 
-    def __init__(self, parent_surface, cost, gem_count, points=0, one_use_only=False, category=0, width=141, height=200, coords=[0,0]):
+    def __init__(self, cost, gem_count, points=0, one_use_only=False, category=0, parent_surface=None, coords=[0,0], width=141, height=200):
         # Sets up all of the variable needed for the card 
         # Creating the surface for the card
 
@@ -80,9 +80,6 @@ class Card:
         self.coords[0], self.coords[1] = new_coords[0], new_coords[1]
 
     # Getters
-    def get_coords(self):
-        return self.coords
-
     def get_cost(self):
         return self.cost
 
@@ -91,15 +88,9 @@ class Card:
 
     def get_points(self):
         return self.points
-    
-    def get_one_use_only(self):
-        return self.one_use_only
 
     def get_category(self):
         return self.category
-    
-    def get_size(self):
-        return (self.width,self.height)
 
     # isClicked
     def isClicked(self):
@@ -172,11 +163,36 @@ class Table:
 
 class Token:
 
-    def __init__(self, gemColor, num=0):
+    default_font_size = 35
+    color_dict = get_colors()
+    
+    def __init__(self, gemColor, num=0, parent_surface=None, coords=[0,0], radius=40):
         # initializes variables
         self.gemColor = gemColor
         self.num = num
+        self.radius = radius
+        self.font_size = int(self.default_font_size*radius/40)
+        self.parent_surface = parent_surface
+        self.surface = pygame.Surface((radius*2, radius*2))
+        #self.surface = pygame.Surface((radius*2, radius*2), pygame.SRCALPHA, 32)
+        #self.surface = self.surface.convert_alpha()
+        self.coords = coords
 
+    def draw(self, rotation = 0):
+        # Draws the token on to the parent surface
+        pygame.draw.circle(self.surface, (128,128,128), (self.radius, self.radius), self.radius)
+        pygame.draw.circle(self.surface, self.color_dict[self.gemColor], (self.radius, self.radius), int(self.radius*0.95))
+        text = str(self.num); font_size = self.font_size; font = pygame.font.get_default_font(); color = (255,255,255)
+        italic = False
+        TextSurf, TextRect= display_text(text, font_size, font, color, italic, rotation)
+        self.surface.blit(TextSurf, ((self.surface.get_width()-TextSurf.get_width())//2,
+                                     (self.surface.get_height()-TextSurf.get_height())//2))
+        self.parent_surface.blit(self.surface, self.coords)
+
+    def set_coords(self, new_coords):
+        # Sets the coords variable to the sqpecified coords
+        self.coords = new_coords
+        
     def get_num(self):
         # gets the number of tokens
         return self.num
@@ -361,25 +377,15 @@ class Player:
         card = self.reservedCards.pop(index)
         self.gainCard(card)
 
-some_cost = {"black": 0,
-            "red": 0,
-            "green": 0,
-            "blue": 0,
-            "white": 0}
-gc1 = {"black": 1,
-            "red": 0,
-            "green": 0,
-            "blue": 0,
-            "white": 0}
-gc2 = {"black": 0,
-            "red": 0,
-            "green": 0,
-            "blue": 0,
-            "white": 3}
-a = Card(None, some_cost, gc1)
-b = Card(None, some_cost, gc1, 1)
-c = Card(None, some_cost, gc2, 2)
-cache = CardCache([a,b,c])
-print(cache.get_cache()["black"][0].get_gem_count())
-print(cache.get_num("white"))
-
+# Test code
+"""
+game_surface = pygame.display.set_mode((1440,900)) 
+game_surface.fill((255,255,255))
+k = Token("blue", 3, game_surface, [100, 100])
+k.draw()
+while 1:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+    pygame.display.flip()
+"""

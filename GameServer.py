@@ -29,6 +29,7 @@ class ClientChannel(Channel):
             data['message'] = 'Mommy says that people my age shouldn\'t suck their thumbs.'
         self._server.SendToAll({"action":"message","message":data['message'],"who":self.nickname})
         self._server.SendTable_Cards()
+        self._server.SendTable_Tokens()
 
     def Network_nickname(self, data):
         # Sets nickname
@@ -72,13 +73,15 @@ class GameServer(Server):
         [p.Send(data) for p in self.players]
 
     def SendTable_Cards(self):
+        ## FIX GAMES[0] PART TO ALLOW FOR MULTIPLE GAMES
         print(self.games[0].get_cards().keys())
         if len(self.games) > 0:
             self.SendToAll({"action": "table_cards", "table_cards": self.games[0].get_cards()})
-    '''
-    def SendTable_Tokens(self, data):
-        self.SendToAll({"action": "table_tokens", "table_tokens": [g.get_tokens_shown()[playerID] for playerID in self.players.keys()]})
-    '''
+    
+    def SendTable_Tokens(self):
+        if len(self.games) > 0:
+            self.SendToAll({"action": "table_tokens", "table_tokens": self.games[0].get_tokens()})
+    
     
     def Launch(self):
         while True:

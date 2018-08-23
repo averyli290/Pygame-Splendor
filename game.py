@@ -25,7 +25,7 @@ class Game:
                         "green": int(line[6]),
                         "blue": int(line[7]),
                         "white": int(line[8])}
-                card = Card(parent_surface, cost, gem_count, points, False, category)
+                card = Card(cost, gem_count, points, False, category, parent_surface)
                 if deckID not in decks.keys():
                     decks[deckID] = []
                 decks[deckID].append(card)
@@ -75,7 +75,15 @@ class Game:
                                     "blue":0,
                                     "white":0,
                                     "gold":0},
-                                    1,False,1,141, 200)]
+                                    1,False,1,[0,0],141,200)]
+        return return_me 
+
+    def get_tokens(self):
+        # Returns all of the tokens to be displayed on the screen for each player
+        # Send tuple with data and coords depending on player
+        return_me={}
+        for p in self.players:
+            return_me[p] = [("blue", 3, [100, 100], 40)]
         return return_me 
 
     def isTokenLimitExceeded(self):
