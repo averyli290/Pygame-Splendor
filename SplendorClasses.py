@@ -174,12 +174,12 @@ class Token:
         self.font_size = int(self.default_font_size*radius/40)
         self.parent_surface = parent_surface
         self.surface = pygame.Surface((radius*2, radius*2))
-        #self.surface = pygame.Surface((radius*2, radius*2), pygame.SRCALPHA, 32)
-        #self.surface = self.surface.convert_alpha()
+        self.surface.set_colorkey((255,0,255))
         self.coords = coords
 
     def draw(self, rotation = 0):
         # Draws the token on to the parent surface
+        self.surface.fill((255,0,255))
         pygame.draw.circle(self.surface, (128,128,128), (self.radius, self.radius), self.radius)
         pygame.draw.circle(self.surface, self.color_dict[self.gemColor], (self.radius, self.radius), int(self.radius*0.95))
         text = str(self.num); font_size = self.font_size; font = pygame.font.get_default_font(); color = (255,255,255)
