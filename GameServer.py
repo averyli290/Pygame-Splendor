@@ -31,6 +31,7 @@ class ClientChannel(Channel):
         self._server.SendTable_Cards()
 
     def Network_nickname(self, data):
+        # Sets nickname
         self.nickname = data['nickname']
         self._server.SendPlayers()
 
@@ -46,13 +47,15 @@ class GameServer(Server):
     
     def Connected(self, channel, addr):
         self.AddPlayer(channel)
+        if len(self.players) == 1:
+            self.games += [Game([self.players[p] for p in self.players])]
     
     def AddPlayer(self, player):
+        # Adds player to dict and sends the player's address back to them for use of playerID
         print("New Player" + str(player.addr))
         self.players[player] = player.addr
         self.SendPlayers()
-        if len(self.players) == 1:
-            self.games += [Game([p.nickname for p in self.players])]
+        self.SendToPlayer({"action": "player_addr", "player_addr": player.addr}, player)
 
     def DelPlayer(self, player):
         print("Deleting Player" + str(player.addr))
@@ -61,11 +64,15 @@ class GameServer(Server):
     
     def SendPlayers(self):
         self.SendToAll({"action": "players", "players": [p.nickname for p in self.players]})
+
+    def SendToPlayer(self, data, player):
+        player.Send(data)
     
     def SendToAll(self, data):
         [p.Send(data) for p in self.players]
 
     def SendTable_Cards(self):
+        print(self.games[0].get_cards().keys())
         self.SendToAll({"action": "table_cards", "table_cards": self.games[0].get_cards()})
     '''
     def SendTable_Tokens(self, data):

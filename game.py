@@ -39,6 +39,7 @@ class Game:
         return Table(decks_actual)
 
     def __init__(self, playerIDs, decks = "cards.txt"):
+        print(playerIDs)
         # creates a new game given supply decks and player IDs
         if type(decks) == type("a generic string"):
             self.table = self.create_table_from_file(decks)
@@ -62,7 +63,6 @@ class Game:
         # Send tuple with data and coords depending on player
         #return_me = {(playerID, []) for playerID in self.players.keys()}
         return_me={}
-        print(self.players)
         for p in self.players:
             return_me[p] = [({"black": 1,
                                     "red":1,

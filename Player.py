@@ -42,6 +42,11 @@ class Client(ConnectionListener):
     #######################################
     ### Network event/message callbacks ###
     #######################################
+
+    def Network_player_addr(self, data):
+        # Gets the player's address and stores it in a variable
+        if data['action'] == 'player_addr':
+            self.addr = data['player_addr']
     
     def Network_players(self, data):
         print("*** players: " + ", ".join([p for p in data['players']]))
@@ -54,7 +59,7 @@ class Client(ConnectionListener):
     def Network_table_cards(self, data):
         # Prints the cards based on the given data
         if data['action'] == "table_cards":
-            for details in data["table_cards"][self.nickname]:
+            for details in data["table_cards"][self.addr]:
                 c = Card(game_surface,details[0],details[1],details[2],details[3],details[4],details[5],details[6])
                 c.draw()
     
