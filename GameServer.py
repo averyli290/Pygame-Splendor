@@ -47,7 +47,7 @@ class GameServer(Server):
     
     def Connected(self, channel, addr):
         self.AddPlayer(channel)
-        if len(self.players) == 1:
+        if len(self.players) == 2:
             self.games += [Game([self.players[p] for p in self.players])]
     
     def AddPlayer(self, player):
@@ -73,7 +73,8 @@ class GameServer(Server):
 
     def SendTable_Cards(self):
         print(self.games[0].get_cards().keys())
-        self.SendToAll({"action": "table_cards", "table_cards": self.games[0].get_cards()})
+        if len(self.games) > 0:
+            self.SendToAll({"action": "table_cards", "table_cards": self.games[0].get_cards()})
     '''
     def SendTable_Tokens(self, data):
         self.SendToAll({"action": "table_tokens", "table_tokens": [g.get_tokens_shown()[playerID] for playerID in self.players.keys()]})
