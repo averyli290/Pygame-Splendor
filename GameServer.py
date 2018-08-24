@@ -27,9 +27,10 @@ class ClientChannel(Channel):
     def Network_message(self, data):
         if data['message'] == "gg ez":
             data['message'] = 'Mommy says that people my age shouldn\'t suck their thumbs.'
+        elif data['message'] == 'startGame()':
+            self._server.StartGame()
+
         self._server.SendToAll({"action":"message","message":data['message'],"who":self.nickname})
-        self._server.SendTable_Cards()
-        self._server.SendTable_Tokens()
 
     def Network_nickname(self, data):
         # Sets nickname
@@ -48,8 +49,6 @@ class GameServer(Server):
     
     def Connected(self, channel, addr):
         self.AddPlayer(channel)
-        if len(self.players) == 2:
-            self.games += [Game([self.players[p] for p in self.players])]
     
     def AddPlayer(self, player):
         # Adds player to dict and sends the player's address back to them for use of playerID
@@ -74,17 +73,21 @@ class GameServer(Server):
 
     def SendTable_Cards(self):
         ## FIX GAMES[0] PART TO ALLOW FOR MULTIPLE GAMES
-        print(self.games[0].get_cards().keys())
         if len(self.games) > 0:
             self.SendToAll({"action": "table_cards", "table_cards": self.games[0].get_cards()})
     
     def SendTable_Tokens(self):
         if len(self.games) > 0:
             self.SendToAll({"action": "table_tokens", "table_tokens": self.games[0].get_tokens()})
-    
-    
+
+    def StartGame(self):
+        self.games += [Game([self.players[p] for p in self.players])]
+
     def Launch(self):
         while True:
+            if len(self.games) > 0:
+                self.SendTable_Cards()
+                self.SendTable_Tokens()
             self.Pump()
             sleep(0.0001)
 

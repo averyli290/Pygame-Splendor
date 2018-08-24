@@ -52,17 +52,26 @@ class Card:
         drawx = 0; drawy = self.surface.get_height()
         textcolor = (200,200,200); font = pygame.font.get_default_font(); italic = True; rotation=0
 
+        textwidth = 0
+        textheight = 0
+        for i in range(1, 10):
+            TextSurf, TextRect = display_text(str(i),self.font_size0,font,textcolor,italic,rotation)
+            tw, th = TextSurf.get_size()
+            textwidth = max(textwidth, tw)
+            textheight = max(textheight, th)
+
         for color in self.cost:
             if self.cost[color] > 0:
                 TextSurf, TextRect = display_text(str(self.cost[color]),self.font_size0,font,textcolor,italic,rotation)
-                textwidth, textheight = TextSurf.get_size()
+                # textwidth, textheight = TextSurf.get_size()
                 drawx = int(textwidth)
-                drawy -= int(TextSurf.get_height()*1.5)
+                drawy -= int(textheight*1.7)
                 pygame.draw.circle(self.surface,(255,255,255),(drawx+textwidth//2,drawy+textheight//2),textwidth)
                 pygame.draw.circle(self.surface,self.colors[color],(drawx+textwidth//2,drawy+textheight//2),int(textwidth*0.99))
                 self.surface.blit(TextSurf,(drawx, drawy))
         
         drawx = int(self.surface.get_width()*1.05); drawy = 0
+        radius = self.surface.get_width()//5
         for color in self.gem_count:
              if self.gem_count[color] > 0:
                 for i in range(self.gem_count[color]):
@@ -70,8 +79,8 @@ class Card:
                     textwidth, textheight = TextSurf.get_size()
                     drawx -= int(textwidth*2)
                     drawy = int(textheight)//10
-                    pygame.draw.circle(self.surface,(255,255,255),(drawx+textwidth//2,drawy+textheight//2),textwidth)
-                    pygame.draw.circle(self.surface,self.colors[color],(drawx+textwidth//2,drawy+textheight//2),int(textwidth*0.99))
+                    pygame.draw.circle(self.surface,(255,255,255),(drawx+textwidth//2,drawy+textheight//2),radius)
+                    pygame.draw.circle(self.surface,self.colors[color],(drawx+textwidth//2,drawy+textheight//2),int(radius*0.99))
                     self.surface.blit(TextSurf,(drawx, drawy))
         self.parent_surface.blit(self.surface, self.coords)
 
@@ -93,7 +102,7 @@ class Card:
         return self.category
 
     # isClicked
-    def isClicked(self):
+    def isClicked(self, coords):
         pass
 
     
