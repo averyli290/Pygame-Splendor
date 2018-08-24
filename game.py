@@ -59,6 +59,7 @@ class Game:
         return self.turn_list[self.turn_index]
 
     def convert_card(self, card):
+        # Converts given card into a list of parameters
         return [card.cost, card.gem_count, card.points, card.one_use_only, card.category, card.coords, card.width, card.height]
     
     def get_cards(self):
@@ -90,9 +91,18 @@ class Game:
         return_me={}
         for p in self.players:
             return_me[p] = list_of_cards
-        return return_me 
+            playerCardCache = self.players[p].get_cards().get_cache()
+            for i in range(len(self.gemColors)):
+                color = self.gemColors[i]
+                for j in range(len(playerCardCache[color])):
+                    card = playerCardCache[color][j]
+                    new_card = self.convert_card(card)
+                    new_card[5] = [405+i*131, 865+35*j]
+                    return_me[p].append(tuple(new_card))
+        return return_me
 
     def convert_token(self, token):
+        # Converts given token into a list of parameters
         return [token.gemColor, token.num, token.coords, token.radius]
     
     def get_tokens(self):
@@ -102,6 +112,23 @@ class Game:
         for p in self.players:
             return_me[p] = [("blue", 3, [100, 100], 40)]
         return return_me 
+
+    def clickSelection(self, coords):
+        # Given the position of a click, find the card/token selected
+        x = coords[0]
+        y = coords[1]
+        if 405 <= x <= 1440-405 and 205 <= y <= 900-205: # table
+            deck_index = -1
+            for i in range(3):
+                if 205+170*i <= y <= 205+170*i+150:
+                    deck_index = i
+            card_index = -1
+            for i in range(4):
+                if 405+(i+1)*131 <= x <= 405+(i+1)*131+106:
+                    card_index = j
+            if deck_index > 0 and card_index > 0:
+                return ["TableCard", deck_index, card_index]
+        return ["None"]
 
     def isTokenLimitExceeded(self):
         # Gets the tokenLimitExceeded variable

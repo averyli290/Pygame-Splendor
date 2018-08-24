@@ -29,6 +29,7 @@ class Card:
             "gold": 0}
 
         self.default_font_size0 = 20 ; self.default_font_size1 = 25 # Two font sizes for the cards
+        self.default_font_size2 = 35 # Font size for the points
 
         self.parent_surface = parent_surface
         for gem in cost: self.cost[gem] += cost[gem]
@@ -42,6 +43,7 @@ class Card:
 
         self.font_size0 = int(height*self.default_font_size0/self.default_height)
         self.font_size1 = int(height*self.default_font_size1/self.default_height)
+        self.font_size2 = int(height*self.default_font_size1/self.default_height)
        
         self.surface = pygame.Surface((width,height)) 
         self.cardcolor = (200,200,200)
@@ -53,23 +55,29 @@ class Card:
         drawx = 0; drawy = self.surface.get_height()
         textcolor = (200,200,200); font = pygame.font.get_default_font(); italic = True; rotation=0
 
-        textwidth = 0
-        textheight = 0
+        textwidth = 100
+        textheight = 100
         for i in range(1, 10):
             TextSurf, TextRect = display_text(str(i),self.font_size0,font,textcolor,italic,rotation)
             tw, th = TextSurf.get_size()
-            textwidth = max(textwidth, tw)
-            textheight = max(textheight, th)
+            textwidth = min(textwidth, tw)
+            textheight = min(textheight, th)
 
+        counter = 0
         for color in self.cost:
             if self.cost[color] > 0:
                 TextSurf, TextRect = display_text(str(self.cost[color]),self.font_size0,font,textcolor,italic,rotation)
                 # textwidth, textheight = TextSurf.get_size()
                 drawx = int(textwidth)
                 drawy -= int(textheight*1.7)
+                if counter > 1:
+                    drawx += int(textwidth*2.5)
+                if counter % 2 == 0 and counter > 0:
+                    drawy += 2*int(textheight*1.7)
                 pygame.draw.circle(self.surface,(255,255,255),(drawx+textwidth//2,drawy+textheight//2),textwidth)
                 pygame.draw.circle(self.surface,self.colors[color],(drawx+textwidth//2,drawy+textheight//2),int(textwidth*0.99))
                 self.surface.blit(TextSurf,(drawx, drawy))
+                counter += 1
         
         drawx = int(self.surface.get_width()*1.05); drawy = 0
         radius = self.surface.get_width()//5
@@ -83,6 +91,13 @@ class Card:
                     pygame.draw.circle(self.surface,(255,255,255),(drawx+textwidth//2,drawy+textheight//2),radius)
                     pygame.draw.circle(self.surface,self.colors[color],(drawx+textwidth//2,drawy+textheight//2),int(radius*0.99))
                     self.surface.blit(TextSurf,(drawx, drawy))
+        if self.points > 0:
+            TextSurf, TextRect = display_text(str(self.points),self.font_size2,font,self.colors["black"],italic,rotation)
+            textwidth, textheight = TextSurf.get_size()
+            drawx = 2*int(textwidth)//3
+            drawy = int(textheight)//3
+            self.surface.blit(TextSurf,(drawx, drawy))
+        
         self.parent_surface.blit(self.surface, self.coords)
 
     def set_coords(self, new_coords):
