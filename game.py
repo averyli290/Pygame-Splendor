@@ -97,7 +97,7 @@ class Game:
                 for j in range(len(playerCardCache[color])):
                     card = playerCardCache[color][j]
                     new_card = self.convert_card(card)
-                    new_card[5] = [405+i*131, 865+35*j]
+                    new_card[5] = [405+i*131, 715+35*j]
                     return_me[p].append(tuple(new_card))
         return return_me
 
@@ -113,8 +113,8 @@ class Game:
             return_me[p] = [("blue", 3, [100, 100], 40)]
         return return_me 
 
-    def clickSelection(self, coords):
-        # Given the position of a click, find the card/token selected
+    def clickSelection(self, coords, player):
+        # Given the position of a click by a player, find the card/token selected
         x = coords[0]
         y = coords[1]
         if 405 <= x <= 1440-405 and 205 <= y <= 900-205: # table
@@ -128,6 +128,19 @@ class Game:
                     card_index = j
             if deck_index > 0 and card_index > 0:
                 return ["TableCard", deck_index, card_index]
+        if 405 <= x <= 1440 and 715 <= y: # player's cards (will we need this?)
+            gem_index = -1
+            card_index = -1
+            for i in range(len(self.gemColors)):
+                playerCardCache = self.players[player].get_cards().get_cache()
+                color = self.gemColors[i]
+                if 405+i*131 <= x <= 405+i*131+106:
+                    gem_index = i
+                for j in range(len(playerCardCache[color])):
+                    if 715+35*j <= y <= 715+35*j+106:
+                        card_index = j
+            if gem_index != -1 and card_index != 1:
+                return ["PlayerCard", self.gemColors[gem_index], card_index]
         return ["None"]
 
     def isTokenLimitExceeded(self):
