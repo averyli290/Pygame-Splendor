@@ -134,23 +134,23 @@ class Deck:
 class Table:
 
     def __init__(self, decks):
-        cardsShown = {}
-        supplyDecks = {}
+        self.cardsShown = {}
+        self.supplyDecks = {}
         # initializes and sets up the table given decks
         for deck in decks:
-            supplyDecks[deck.deckID] = deck
-            cardsShown[deck.deckID] = []
-        for deckID in supplyDecks.keys():
-            for i in range(supplyDecks[deckID].get_numCardsShown()):
-                if supplyDecks[deckID].get_numCards() > 0:
-                    cardsShown[deckID].append(supplyDecks[deckID].draw_card())
+            self.supplyDecks[deck.deckID] = deck
+            self.cardsShown[deck.deckID] = []
+        for deckID in self.supplyDecks.keys():
+            for i in range(self.supplyDecks[deckID].get_numCardsShown()):
+                if self.supplyDecks[deckID].get_numCards() > 0:
+                    self.cardsShown[deckID].append(self.supplyDecks[deckID].draw_card())
 
     def pick_card(self, deckID, index):
         # removes a card shown, replaces it with the top card of its corresponding deck,
         # and returns the removed card
-        pickedCard = cardsShown[deckID].pop(index)
-        if supplyDecks[deckID].get_numCards() > 0:
-            cardsShown[deckID].insert(index, supplyDecks[deckID].draw_card())
+        pickedCard = self.cardsShown[deckID].pop(index)
+        if self.supplyDecks[deckID].get_numCards() > 0:
+            self.cardsShown[deckID].insert(index, self.supplyDecks[deckID].draw_card())
         return pickedCard
 
     def get_cardsShown(self):

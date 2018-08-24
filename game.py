@@ -57,27 +57,44 @@ class Game:
     def get_turn(self):
         # Gets whose turn it is
         return self.turn_list[self.turn_index]
+
+    def convert_card(self, card):
+        return [card.cost, card.gem_count, card.points, card.one_use_only, card.category, card.coords, card.width, card.height]
     
     def get_cards(self):
         # Returns all of the cards to be displayed on the screen for each player
         # Send tuple with data and coords depending on player
         #return_me = {(playerID, []) for playerID in self.players.keys()}
-        return_me={}
-        for p in self.players:
-            return_me[p] = [({"black": 1,
-                                    "red":1,
+        list_of_cards = []
+        supplyDecks = self.table.get_supplyDecks()
+        i = 0
+        for deckID in supplyDecks:
+            list_of_cards.append(({"black": supplyDecks[deckID].get_category(),
+                                    "red":0,
                                     "green":0,
                                     "blue":0,
                                     "white":0},
-                                    {"black": 1,
+                             {"black": 0,
                                     "red":0,
                                     "green":0,
                                     "blue":0,
                                     "white":0,
                                     "gold":0},
-                                    1,False,1,[0,0],141,200)]
+                             0,False,supplyDecks[deckID].get_category(),[318,130+220*i],141,200))
+            for j in range(len(self.table.get_cardsShown()[deckID])):
+                card = self.table.get_cardsShown()[deckID][j]
+                new_card = self.convert_card(card)
+                new_card[5] = [318+(j+1)*166, 130+220*i]
+                list_of_cards.append(tuple(new_card))
+            i += 1
+        return_me={}
+        for p in self.players:
+            return_me[p] = list_of_cards
         return return_me 
 
+    def convert_token(self, token):
+        return [token.gemColor, token.num, token.coords, token.radius]
+    
     def get_tokens(self):
         # Returns all of the tokens to be displayed on the screen for each player
         # Send tuple with data and coords depending on player
