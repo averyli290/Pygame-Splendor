@@ -80,11 +80,11 @@ class Game:
                                     "blue":0,
                                     "white":0,
                                     "gold":0},
-                             0,False,supplyDecks[deckID].get_category(),[318,130+220*i],141,200))
+                             0,False,supplyDecks[deckID].get_category(),[405,205+170*i],106,150))
             for j in range(len(self.table.get_cardsShown()[deckID])):
                 card = self.table.get_cardsShown()[deckID][j]
                 new_card = self.convert_card(card)
-                new_card[5] = [318+(j+1)*166, 130+220*i]
+                new_card[5] = [405+(j+1)*131, 205+170*i]
                 list_of_cards.append(tuple(new_card))
             i += 1
         return_me={}

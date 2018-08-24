@@ -10,8 +10,9 @@ pygame.init()
 class Card:
     
     colors = get_colors()
+    default_width, default_height = 106, 150
 
-    def __init__(self, cost, gem_count, points=0, one_use_only=False, category=0, parent_surface=None, coords=[0,0], width=141, height=200):
+    def __init__(self, cost, gem_count, points=0, one_use_only=False, category=0, parent_surface=None, coords=[0,0], width=default_width, height=default_height):
         # Sets up all of the variable needed for the card 
         # Creating the surface for the card
 
@@ -39,8 +40,8 @@ class Card:
         self.height = height 
         self.coords = coords
 
-        self.font_size0 = int(height*self.default_font_size0/200)
-        self.font_size1 = int(height*self.default_font_size1/200)
+        self.font_size0 = int(height*self.default_font_size0/self.default_height)
+        self.font_size1 = int(height*self.default_font_size1/self.default_height)
        
         self.surface = pygame.Surface((width,height)) 
         self.cardcolor = (200,200,200)
