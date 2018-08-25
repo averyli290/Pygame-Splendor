@@ -39,7 +39,6 @@ class Game:
         return Table(decks_actual)
 
     def __init__(self, playerIDs, decks = "cards.txt"):
-        print(playerIDs)
         # creates a new game given supply decks and player IDs
         if type(decks) == type("a generic string"):
             self.table = self.create_table_from_file(decks)
@@ -47,7 +46,7 @@ class Game:
             self.table = Table(decks)
         self.players = {}
         for ID in playerIDs:
-            self.players[ID] = Player(ID, 10)
+            self.players[ID] = Player(ID)
         self.turn_list = playerIDs
         self.turn_index = 0
         self.tokenBank = TokenCache([Token(color, 7) for color in self.gemColors])
@@ -161,16 +160,17 @@ class Game:
             self.finalStage[self.turn_index] = 1
         self.turn_index = (self.turn_index + 1) % len(self.turn_list)
 
-    def canAfford(player, cost, gems_spent = TokenCache()):
+    def canAfford(self, player, cost, gems_spent = TokenCache()):
         # Determines whether the player's cards and the gems spent cover the cost (of a card)
-        total_gems = TokenCache()
+        # Does not yet detect whether it's exactly enough tokens, so good luck if you overspend... [FIX (it's an easy one)]
         gemColors = ["black", "red", "green", "blue", "white", "gold"]
-        for color in gemColors:
-            total_gems.receive(player.get_tokens())
-            total_gems.receive(gems_spent())
+        total_gems = player.get_cards().get_gems()
+        print("total_gems:", total_gems.get_total_num())
+        total_gems.receive(gems_spent)
         total_deficit = 0
         for color in gemColors[:5]:
             total_deficit += max(0, cost.get_num(color) - total_gems.get_num(color))
+            print("marker:", cost.get_num(color), total_gems.get_num(color))
         return total_deficit <= total_gems.get_num("gold")
 
     def turn_tokenDraw(self, tokens):
@@ -179,12 +179,12 @@ class Game:
         # Returns 2 if token limit is exceeded
         player = self.players[self.get_turn()]
         gemColors = ["black", "red", "green", "blue", "white", "gold"]
-        if self.tokens.get_num("gold") > 0:
+        if tokens.get_num("gold") > 0:
             return False
-        distribution = sorted([self.tokens.get_num(color) for color in gemColors])
+        distribution = sorted([tokens.get_num(color) for color in gemColors])
         greatestGem = ""
         for color in gemColors:
-            if self.tokens.get_num(color) == distribution[-1]:
+            if tokens.get_num(color) == distribution[-1]:
                 greatestGem = color
         if not (distribution == [0,0,0,1,1,1] or (distribution == [0,0,0,0,0,2] and self.tokenBank.get_num(greatestGem) >= 4)):
             return False
@@ -200,7 +200,7 @@ class Game:
         card = self.table.get_cardsShown()[deckID][index]
         cost_dict = card.get_cost()
         cost = TokenCache([Token(color, cost_dict[color]) for color in gemColors[:5]])
-        if not canAfford(player, cost, tokens):
+        if not self.canAfford(player, cost, tokens):
             return False
         if not player.giveTokens(tokens):
             return False
@@ -213,15 +213,15 @@ class Game:
         # Returns true if successful, false if not, and will not do if false
         player = self.players[self.get_turn()]
         gemColors = ["black", "red", "green", "blue", "white", "gold"]
-        card = player.get_reservedCards[index]
+        card = player.get_reservedCards()[index]
         cost_dict = card.get_cost()
         cost = TokenCache([Token(color, cost_dict[color]) for color in gemColors[:5]])
-        if not canAfford(player, cost, tokens):
+        if not self.canAfford(player, cost, tokens):
             return False
         if not player.giveTokens(tokens):
             return False
         self.tokenBank.receive(tokens)
-        player.gainCard(player.pickReservedCard(index))
+        player.gainCard(player.pickReserveCard(index))
         return True
 
     def turn_reserveCard(self, deckID, index):
@@ -232,7 +232,7 @@ class Game:
         if not player.canReserveCard():
             return False
         card = self.table.pick_card(deckID, index)
-        player.gainCard(card)
+        player.reserveCard(card)
         good = 1
         if self.tokenBank.get_num("gold") > 0:
             goldToken = Token("gold", 1)
@@ -244,9 +244,9 @@ class Game:
         # Player returns some tokens to the bank (tokens is a TokenCache object)
         # Returns true if successful, false if not, and will not do if false
         player = self.players[self.get_turn()]
-        if self.player.get_tokens().get_total_num() - tokens.get_total_num() != player.get_tokens().get_limit():
+        if player.get_tokens().get_total_num() - tokens.get_total_num() != player.get_tokens().get_limit():
             return False
-        if not self.player.give(tokens):
+        if not player.giveTokens(tokens):
             return False
         self.tokenBank.receive(tokens)
         return True
@@ -255,15 +255,15 @@ class Game:
         # Handles a player's turn using the "turn" functions
         # Does not use the turn if such function returns false
         # Returns true if turn is complete, false if unsuccessful or if player is to return tokens
-        if self.tokenLimitExceeded:
+        if self.tokenLimitExceeded and turn_type == "returnTokens": # fixed
             good = self.turn_returnTokens(parameters[0])
-        if turn_type == "tokenDraw":
+        elif turn_type == "tokenDraw": # fixed
             good = self.turn_tokenDraw(parameters[0])
-        if turn_type == "buyTableCard":
+        elif turn_type == "buyTableCard": # fixed
             good = self.turn_buyTableCard(parameters[0], parameters[1], parameters[2])
-        if turn_type == "buyReserveCard":
+        elif turn_type == "buyReserveCard": # fixed
             good = self.turn_buyReserveCard(parameters[0], parameters[1])
-        if turn_type == "reserveCard":
+        elif turn_type == "reserveCard": # fixed
             good = self.turn_reserveCard(parameters[0], parameters[1])
         if good == 2:
             self.tokenLimitExceeded = True
@@ -273,4 +273,70 @@ class Game:
             self.next_turn()
         return good
 
-a = Game([])
+########################################
+## Test code for conceptual operation ##
+########################################
+
+a = Game(['Player1', 'Player2', 'Player3', 'Player4'])
+t1 = Token("blue", 1)
+t2 = Token("red", 1)
+t3 = Token("green", 1)
+t4 = Token("white", 1)
+t5 = Token("black", 1)
+tc1 = TokenCache([t1, t2, t3])
+tc2 = TokenCache([t4, t5, t1])
+tc3 = TokenCache([t2, t3, t4])
+turns = [tc1, tc2, tc3]
+for i in range(3):
+    good = a.handle_turn("tokenDraw", [turns[i]])
+    if a.get_turn() != "Player1":
+        for j in range(3):
+            a.next_turn()
+    for player in a.players:
+        print(a.players[player].get_tokens().get_total_num(), player, a.get_turn())
+t1 = Token("blue", 2)
+t2 = Token("red", 2)
+t3 = Token("green", 2)
+t4 = Token("white", 2)
+t6 = Token("gold", 1)
+tc4 = TokenCache([t1, t2, t3, t4, t5, t6])
+tc5 = TokenCache([t6])
+
+print(a.handle_turn("reserveCard", [1, 0]))
+print(a.players["Player1"].get_reservedCards())
+for player in a.players:
+    print(a.players[player].get_tokens().get_total_num(), player, a.get_turn())
+
+if a.get_turn() != "Player1":
+    for j in range(3):
+        a.next_turn()
+
+print(a.handle_turn("reserveCard", [1, 0]))
+print(a.players["Player1"].get_reservedCards())
+for player in a.players:
+    print(a.players[player].get_tokens().get_total_num(), player, a.get_turn())
+
+print(a.handle_turn("returnTokens", [tc5]))
+
+if a.get_turn() != "Player1":
+    for j in range(3):
+        a.next_turn()
+
+print(a.players["Player1"].get_reservedCards()[0].get_cost())
+print(a.handle_turn("buyReserveCard", [0, tc4]))
+print(a.players["Player1"].get_cards().get_cache())
+print(a.players["Player1"].get_reservedCards())
+
+"""
+print(a.table.get_cardsShown()[1][0].get_cost())
+print(a.handle_turn("buyTableCard", [1, 0, tc4]))
+print(a.players["Player1"].get_cards().get_cache())
+
+if a.get_turn() != "Player1":
+    for j in range(3):
+        a.next_turn()
+
+print(a.table.get_cardsShown()[1][0].get_cost())
+print(a.handle_turn("buyTableCard", [1, 0, TokenCache()]))
+print(a.players["Player1"].get_cards().get_cache())
+"""

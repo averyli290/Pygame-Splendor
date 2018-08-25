@@ -287,8 +287,8 @@ class CardCache:
         # initializes cache given a list of cards
         # will need to implement a one-use-card cache (for expansion)
         self.cache = {}
-        gemColors = ["black", "red", "green", "blue", "white", "gold"]
-        self.cache = {color: [] for color in gemColors}
+        self.gemColors = ["black", "red", "green", "blue", "white", "gold"]
+        self.cache = {color: [] for color in self.gemColors}
         for card in listOfCards:
             # currently assumes only one kind of gem at a time
             gem_count = card.get_gem_count()
@@ -313,6 +313,16 @@ class CardCache:
     def get_num_points(self):
         # gets the total number of points (in the cards)
         return sum([sum(card.get_points() for card in self.cache[color]) for color in self.cache.keys()])
+
+    def get_gems(self):
+        # returns a TokenCache object symbolizing the coverage of the cards as gem engines
+        return_me = TokenCache()
+        for color in self.gemColors:
+            print("In CardCache class:", color, self.get_num(color))
+            t = Token(color, self.get_num(color))
+            tc = TokenCache([t])
+            return_me.receive(tc)
+        return return_me
 
     def add_card(self, card):
         # adds card to cache
@@ -383,7 +393,7 @@ class Player:
 
     def canReserveCard(self):
         # returns whether a card may be reserved
-        return len(self.reservedCards) >= reserveLimit
+        return len(self.reservedCards) < self.reserveLimit
 
     def reserveCard(self, card):
         # reserves card into reservedCards, up to reserveLimit (in which card will not be reserved)
