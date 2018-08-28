@@ -83,6 +83,70 @@ class GameServer(Server):
     def StartGame(self):
         self.games += [Game([self.players[p] for p in self.players])]
 
+        ## Test code
+        a = self.games[0]
+        Player1 = a.turn_list[0]
+        t1 = Token("blue", 1)
+        t2 = Token("red", 1)
+        t3 = Token("green", 1)
+        t4 = Token("white", 1)
+        t5 = Token("black", 1)
+        tc1 = TokenCache([t1, t2, t3])
+        tc2 = TokenCache([t4, t5, t1])
+        tc3 = TokenCache([t2, t3, t4])
+        turns = [tc1, tc2, tc3]
+        for i in range(3):
+            good = a.handle_turn("tokenDraw", [turns[i]])
+            if a.get_turn() != Player1:
+                for j in range(3):
+                    a.next_turn()
+            for player in a.players:
+                print(a.players[player].get_tokens().get_total_num(), player, a.get_turn())
+        t1 = Token("blue", 2)
+        t2 = Token("red", 2)
+        t3 = Token("green", 2)
+        t4 = Token("white", 2)
+        t6 = Token("gold", 1)
+        tc4 = TokenCache([t1, t2, t3, t4, t5, t6])
+        tc5 = TokenCache([t6])
+
+        print(a.handle_turn("reserveCard", [1, 0]))
+        print(a.players[Player1].get_reservedCards())
+        for player in a.players:
+            print(a.players[player].get_tokens().get_total_num(), player, a.get_turn())
+
+        if a.get_turn() != Player1:
+            for j in range(3):
+                a.next_turn()
+
+        print(a.handle_turn("reserveCard", [1, 0]))
+        print(a.players[Player1].get_reservedCards())
+        for player in a.players:
+            print(a.players[player].get_tokens().get_total_num(), player, a.get_turn())
+
+        print(a.handle_turn("returnTokens", [tc5]))
+
+        if a.get_turn() != Player1:
+            for j in range(3):
+                a.next_turn()
+
+        print(a.players[Player1].get_reservedCards()[0].get_cost())
+        print(a.handle_turn("buyReserveCard", [0, tc4]))
+        print(a.players[Player1].get_cards().get_cache())
+        print(a.players[Player1].get_reservedCards())
+
+        print(a.table.get_cardsShown()[1][0].get_cost())
+        print(a.handle_turn("buyTableCard", [1, 0, tc4]))
+        print(a.players[Player1].get_cards().get_cache())
+
+        if a.get_turn() != Player1:
+            for j in range(3):
+                a.next_turn()
+
+        print(a.table.get_cardsShown()[1][0].get_cost())
+        print(a.handle_turn("buyTableCard", [1, 0, TokenCache()]))
+        print(a.players[Player1].get_cards().get_cache())
+
     def Launch(self):
         while True:
             if len(self.games) > 0:

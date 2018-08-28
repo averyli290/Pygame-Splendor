@@ -11,8 +11,6 @@ from SplendorClasses import *
 pygame.font.init()
 pygame.init()
 
-game_surface = pygame.display.set_mode((1440,900)) 
-
 # This example uses Python threads to manage async input from sys.stdin.
 # This is so that I can receive input from the console whilst running the server.
 # Don't ever do this - it's slow and ugly. (I'm doing it for simplicity's sake)
@@ -25,6 +23,7 @@ class Client(ConnectionListener):
         print("Ctrl-C to exit")
         # get a nickname from the user before starting
         self.nickname = str(input("Enter your nickname: "))
+        self.game_surface = pygame.display.set_mode((1440,900)) 
         connection.Send({"action": "nickname", "nickname": self.nickname})
         # launch our threaded input loop
         t = start_new_thread(self.InputLoop, ())
@@ -60,14 +59,14 @@ class Client(ConnectionListener):
         # Prints the cards based on the given data
         if data['action'] == "table_cards":
             for details in data["table_cards"][self.addr]:
-                c = Card(details[0],details[1],details[2],details[3],details[4],game_surface,details[5],details[6],details[7])
+                c = Card(details[0],details[1],details[2],details[3],details[4],self.game_surface,details[5],details[6],details[7])
                 c.draw()
     
     def Network_table_tokens(self, data):
         # Prints the tokens based on the given data
         if data['action'] == "table_tokens":
             for details in data["table_tokens"][self.addr]:
-                t = Token(details[0],details[1],game_surface,details[2],details[3])
+                t = Token(details[0],details[1],self.game_surface,details[2],details[3])
                 t.draw()
 
     # built in stuff

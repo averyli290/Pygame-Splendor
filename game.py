@@ -89,7 +89,9 @@ class Game:
             i += 1
         return_me={}
         for p in self.players:
-            return_me[p] = list_of_cards
+            return_me[p] = []
+            for card in list_of_cards:
+                return_me[p].append(card)
             playerCardCache = self.players[p].get_cards().get_cache()
             for i in range(len(self.gemColors)):
                 color = self.gemColors[i]
@@ -276,7 +278,7 @@ class Game:
 ########################################
 ## Test code for conceptual operation ##
 ########################################
-
+"""
 a = Game(['Player1', 'Player2', 'Player3', 'Player4'])
 t1 = Token("blue", 1)
 t2 = Token("red", 1)
@@ -327,7 +329,6 @@ print(a.handle_turn("buyReserveCard", [0, tc4]))
 print(a.players["Player1"].get_cards().get_cache())
 print(a.players["Player1"].get_reservedCards())
 
-"""
 print(a.table.get_cardsShown()[1][0].get_cost())
 print(a.handle_turn("buyTableCard", [1, 0, tc4]))
 print(a.players["Player1"].get_cards().get_cache())
