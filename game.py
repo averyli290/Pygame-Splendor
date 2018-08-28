@@ -101,7 +101,7 @@ class Game:
                 for j in range(len(playerCardCache[color])):
                     card = playerCardCache[color][j]
                     new_card = self.convert_card(card)
-                    new_card[5] = [m+i*(w+25), m+3*h+60+35*j]
+                    new_card[5] = [m+i*(w+25), m+3*h+120+35*j]
                     return_me[p].append(tuple(new_card))
         return return_me
 
@@ -112,9 +112,17 @@ class Game:
     def get_tokens(self):
         # Returns all of the tokens to be displayed on the screen for each player
         # Send tuple with data and coords depending on player
+        w, h = 70, 100
+        m = 280
         return_me={}
         for p in self.players:
-            return_me[p] = [("blue", 3, [100, 100], 40)]
+            return_me[p] = []
+            drawx, drawy = m + w//2, m+3*h+80
+            for gem_color in self.tokenBank.gemColors:
+                token_count = self.tokenBank.get_num(gem_color)
+                t = Token(gem_color, token_count, None, (drawx, drawy), 20)
+                drawx += t.surface.get_width()*15/8
+                return_me[p].append(self.convert_token(t))
         return return_me 
 
     def clickSelection(self, coords, player):

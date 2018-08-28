@@ -239,8 +239,8 @@ class TokenCache:
     def __init__(self, listOfTokens = [], limit = 1000000):
         # initializes the cache from the list of tokens (assuming no two have the same color)
         self.cache = {}
-        gemColors = ["black", "red", "green", "blue", "white", "gold"]
-        for color in gemColors:
+        self.gemColors = ["black", "red", "green", "blue", "white", "gold"]
+        for color in self.gemColors:
             self.cache[color] = Token(color)
         for token in listOfTokens:
             self.cache[token.get_gemColor()] = Token(token.get_gemColor(), token.get_num())
