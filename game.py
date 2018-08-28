@@ -65,6 +65,9 @@ class Game:
         # Returns all of the cards to be displayed on the screen for each player
         # Send tuple with data and coords depending on player
         #return_me = {(playerID, []) for playerID in self.players.keys()}
+        
+        w, h = 70, 100 # taken from default width, height
+        m = 280 # margin (equal for x and y directions)
         list_of_cards = []
         supplyDecks = self.table.get_supplyDecks()
         i = 0
@@ -80,11 +83,11 @@ class Game:
                                     "blue":0,
                                     "white":0,
                                     "gold":0},
-                             0,False,supplyDecks[deckID].get_category(),[405,205+170*i],106,150))
+                             0,False,supplyDecks[deckID].get_category(),[m,m+(h+20)*i],w,h))
             for j in range(len(self.table.get_cardsShown()[deckID])):
                 card = self.table.get_cardsShown()[deckID][j]
                 new_card = self.convert_card(card)
-                new_card[5] = [405+(j+1)*131, 205+170*i]
+                new_card[5] = [m+(j+1)*(w+25), m+(h+20)*i]
                 list_of_cards.append(tuple(new_card))
             i += 1
         return_me={}
@@ -98,7 +101,7 @@ class Game:
                 for j in range(len(playerCardCache[color])):
                     card = playerCardCache[color][j]
                     new_card = self.convert_card(card)
-                    new_card[5] = [405+i*131, 715+35*j]
+                    new_card[5] = [m+i*(w+25), m+3*h+60+35*j]
                     return_me[p].append(tuple(new_card))
         return return_me
 
