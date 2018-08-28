@@ -10,7 +10,7 @@ pygame.init()
 class Card:
     
     colors = get_colors()
-    default_width, default_height = 106, 150
+    default_width, default_height = 70, 100   #  106, 150
 
     def __init__(self, cost, gem_count, points=0, one_use_only=False, category=0, parent_surface=None, coords=[0,0], width=default_width, height=default_height):
         # Sets up all of the variable needed for the card 
@@ -28,7 +28,7 @@ class Card:
             "white": 0,
             "gold": 0}
 
-        self.default_font_size0 = 20 ; self.default_font_size1 = 25 # Two font sizes for the cards
+        self.default_font_size0 = 15 ; self.default_font_size1 = 25 # Two font sizes for the cards; self.default_font_size0 was 20
         self.default_font_size2 = 35 # Font size for the points
 
         self.parent_surface = parent_surface
