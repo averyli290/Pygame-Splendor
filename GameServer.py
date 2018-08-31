@@ -37,6 +37,10 @@ class ClientChannel(Channel):
         self.nickname = data['nickname']
         self._server.SendPlayers()
 
+    def Network_mouseclick(self, data):
+        # Sends the mouse data over to the server
+        self._server.HandleMouse(data['mouseclick'])
+
 
 class GameServer(Server):
     channelClass = ClientChannel
@@ -79,6 +83,10 @@ class GameServer(Server):
     def SendTable_Tokens(self):
         if len(self.games) > 0:
             self.SendToAll({"action": "table_tokens", "table_tokens": self.games[0].get_tokens()})
+
+    def HandleMouse(self, data):
+        # Handles Mouse data being sent
+        pass
 
     def StartGame(self):
         self.games += [Game([self.players[p] for p in self.players])]

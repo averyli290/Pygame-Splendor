@@ -44,11 +44,8 @@ class Client(ConnectionListener):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-    
-    def handle_mouse(self):
-        # Sends mouse status to the server, in form of (mouse button status, mouse position)
-        connection.Send({"action": "mouseclick", "mouseclick": (pygame.mouse.get_pressed(),
-                                                                pygame.mouse.get_pos())})
+            elif event.type == pygame.get_pressed == (1,0,0):
+                connection.Send({"action": "mouseclick", "mouseclick": event})
     
     #######################################
     ### Network event/message callbacks ###
@@ -103,6 +100,4 @@ else:
     while 1:
         c.Loop()
         sleep(0.001)
-        c.handle_events()
-        c.handle_mouse()
         pygame.display.flip()
